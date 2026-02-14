@@ -1,0 +1,140 @@
+import { supabase } from '../lib/supabase';
+import { Conversation, ChatMessage } from '../types';
+
+export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
+    const { data, error } = await supabase
+        .from('conversations')
+        .select('*, buyer:profiles!conversations_buyer_id_fkey(*), seller:profiles!conversations_seller_id_fkey(*), items(*)')
+        .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
+        .order('last_message_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching conversations:', error);
+        return [];
+    }
+
+    return (data || []).map((row: any) => ({
+        id: row.id,
+        item_id: row.item_id,
+        buyer_id: row.buyer_id,
+        seller_id: row.seller_id,
+        last_message: row.last_message,
+        last_message_at: row.last_message_at,
+        created_at: row.created_at,
+        other_user: row.buyer_id === userId ? row.seller : row.buyer,
+        item: row.items,
+    }));
+};
+
+export const fetchConversationById = async (conversationId: string, currentUserId: string): Promise<Conversation | null> => {
+    const { data, error } = await supabase
+        .from('conversations')
+        .select('*, buyer:profiles!conversations_buyer_id_fkey(*), seller:profiles!conversations_seller_id_fkey(*), items(*)')
+        .eq('id', conversationId)
+        .single();
+
+    if (error || !data) return null;
+
+    return {
+        id: data.id,
+        item_id: data.item_id,
+        buyer_id: data.buyer_id,
+        seller_id: data.seller_id,
+        last_message: data.last_message,
+        last_message_at: data.last_message_at,
+        created_at: data.created_at,
+        other_user: data.buyer_id === currentUserId ? data.seller : data.buyer,
+        item: data.items,
+    } as Conversation;
+};
+
+export const fetchMessages = async (conversationId: string): Promise<ChatMessage[]> => {
+    const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching messages:', error);
+        return [];
+    }
+
+    return (data || []) as ChatMessage[];
+};
+
+export const sendMessage = async (
+    conversationId: string,
+    senderId: string,
+    text: string,
+    type: 'text' | 'bid' | 'alert' = 'text',
+    metadata: Record<string, any> = {}
+): Promise<ChatMessage | null> => {
+    const { data, error } = await supabase
+        .from('messages')
+        .insert({
+            conversation_id: conversationId,
+            sender_id: senderId,
+            text,
+            type,
+            metadata,
+        })
+        .select('*')
+        .single();
+
+    if (error) {
+        console.error('Error sending message:', error);
+        return null;
+    }
+
+    return data as ChatMessage;
+};
+
+export const createConversation = async (
+    itemId: string,
+    buyerId: string,
+    sellerId: string
+): Promise<Conversation | null> => {
+    // Check if conversation already exists
+    const { data: existing } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('item_id', itemId)
+        .eq('buyer_id', buyerId)
+        .eq('seller_id', sellerId)
+        .single();
+
+    if (existing) return existing as Conversation;
+
+    const { data, error } = await supabase
+        .from('conversations')
+        .insert({ item_id: itemId, buyer_id: buyerId, seller_id: sellerId })
+        .select('*')
+        .single();
+
+    if (error) {
+        console.error('Error creating conversation:', error);
+        return null;
+    }
+
+    return data as Conversation;
+};
+
+export const subscribeToMessages = (
+    conversationId: string,
+    callback: (payload: any) => void
+) => {
+    return supabase
+        .channel(`messages-${conversationId}`)
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'messages',
+                filter: `conversation_id=eq.${conversationId}`,
+            },
+            callback
+        )
+        .subscribe();
+};

@@ -1,0 +1,8 @@
+{
+  "name": "Campus Marketplace",
+  "description": "A student-exclusive auction and marketplace app for campus items like textbooks, tech, and furniture.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
