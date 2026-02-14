@@ -37,19 +37,19 @@ const BidsScreen: React.FC<BidsScreenProps> = ({ items, onNavigate }) => {
   const displayBids = activeTab === 'Active' ? activeBids : pastBids;
 
   return (
-    <div className="flex-1 bg-background-dark text-white pb-24 font-display">
-      <header className="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md px-4 pt-12 pb-4 border-b border-border-dark">
-        <h1 className="text-xl font-bold tracking-tight mb-4 text-center uppercase tracking-widest">My Bids</h1>
-        <div className="flex p-1 bg-surface-dark rounded-xl">
+    <div className="flex-1 bg-background-light pb-24 font-display">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md px-4 pt-12 pb-4 border-b border-slate-200">
+        <h1 className="text-xl font-bold tracking-tight mb-4 text-center uppercase tracking-widest text-secondary">My Bids</h1>
+        <div className="flex p-1 bg-slate-100 rounded-xl border border-slate-200">
           <button
             onClick={() => setActiveTab('Active')}
-            className={`flex-1 py-2 text-sm font-semibold rounded-[10px] transition-all ${activeTab === 'Active' ? 'bg-primary text-slate-900 shadow-md' : 'text-slate-500'}`}
+            className={`flex-1 py-2 text-sm font-semibold rounded-[10px] transition-all ${activeTab === 'Active' ? 'bg-white text-secondary shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
           >
             Active ({activeBids.length})
           </button>
           <button
             onClick={() => setActiveTab('Past')}
-            className={`flex-1 py-2 text-sm font-semibold rounded-[10px] transition-all ${activeTab === 'Past' ? 'bg-primary text-slate-900 shadow-md' : 'text-slate-500'}`}
+            className={`flex-1 py-2 text-sm font-semibold rounded-[10px] transition-all ${activeTab === 'Past' ? 'bg-white text-secondary shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
           >
             Past ({pastBids.length})
           </button>
@@ -86,18 +86,18 @@ const BidsScreen: React.FC<BidsScreenProps> = ({ items, onNavigate }) => {
                     const item = dbItemToItem(itemData);
                     onNavigate(AppScreen.DETAILS, item);
                   }}
-                  className="bg-surface-dark border border-border-dark rounded-2xl p-4 cursor-pointer hover:border-primary/30 transition-all"
+                  className="bg-white border border-slate-200 rounded-2xl p-4 cursor-pointer hover:border-primary/30 transition-all shadow-sm hover:shadow-md"
                 >
                   <div className="flex gap-3">
                     <div className="relative w-20 h-20 shrink-0">
                       <img className="w-full h-full object-cover rounded-xl" src={itemData.images?.[0] || 'https://picsum.photos/seed/bid/100/100'} alt={itemData.title} />
-                      <div className={`absolute top-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${isHighestBid ? 'bg-primary/20 text-primary border-primary/30' : 'bg-orange-500/20 text-orange-500 border-orange-500/30'}`}>
+                      <div className={`absolute top-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${isHighestBid ? 'bg-success/10 text-success border-success/20' : 'bg-orange-500/10 text-orange-500 border-orange-500/20'}`}>
                         {isHighestBid ? 'Winning' : 'Outbid'}
                       </div>
                     </div>
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
-                        <h3 className="font-semibold text-sm leading-tight truncate">{itemData.title}</h3>
+                        <h3 className="font-semibold text-sm leading-tight truncate text-secondary">{itemData.title}</h3>
                         <p className="text-xs text-primary font-bold mt-1">Your bid: ${Number(bid.amount).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center justify-between text-xs text-slate-400">
@@ -105,7 +105,7 @@ const BidsScreen: React.FC<BidsScreenProps> = ({ items, onNavigate }) => {
                           <span className="material-icons-round text-xs">schedule</span>
                           {itemData.time_left || 'Ended'}
                         </span>
-                        <span>Current: ${Number(itemData.current_bid).toFixed(2)}</span>
+                        <span className="text-slate-500">Current: ${Number(itemData.current_bid).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

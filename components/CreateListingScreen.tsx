@@ -102,10 +102,10 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
   );
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#16212c]">
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#16212c]/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
-        <button onClick={onBack} className="text-primary font-medium text-sm">Cancel</button>
-        <h1 className="text-lg font-bold">New Listing</h1>
+    <div className="flex-1 flex flex-col bg-slate-50">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-slate-200">
+        <button onClick={onBack} className="text-secondary font-medium text-sm">Cancel</button>
+        <h1 className="text-lg font-bold text-secondary">New Listing</h1>
         <button className="text-primary font-bold text-sm">Save Draft</button>
       </header>
 
@@ -120,7 +120,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-100 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-0 rounded-lg py-3 px-4 text-sm transition-all text-white"
+              className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 px-4 text-sm transition-all text-secondary placeholder-slate-400"
               placeholder={category === 'housing' ? "e.g. Sunny Room near Campus" : "e.g. MacBook Pro 2021 M1 Pro"}
               required
               type="text"
@@ -131,7 +131,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-slate-100 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-0 rounded-lg py-3 px-4 text-sm appearance-none text-white"
+              className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 px-4 text-sm appearance-none text-secondary"
             >
               <option value="tech">Electronics</option>
               <option value="textbooks">Textbooks</option>
@@ -151,7 +151,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                   <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Type</label>
                   <select
                     value={housingType} onChange={(e) => setHousingType(e.target.value as any)}
-                    className="w-full bg-white dark:bg-slate-900 border-transparent rounded-lg text-sm text-white"
+                    className="w-full bg-white border border-slate-200 rounded-lg text-sm text-secondary"
                   >
                     <option value="sublet">Sublet</option>
                     <option value="room">Room</option>
@@ -163,7 +163,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                   <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sq Ft (Optional)</label>
                   <input
                     type="number" value={sqft} onChange={e => setSqft(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border-transparent rounded-lg text-sm text-white"
+                    className="w-full bg-white border border-slate-200 rounded-lg text-sm text-secondary"
                     placeholder="e.g. 500"
                   />
                 </div>
@@ -174,14 +174,14 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                   <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Lease Start</label>
                   <input
                     type="date" value={leaseStart} onChange={e => setLeaseStart(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border-transparent rounded-lg text-sm text-white"
+                    className="w-full bg-white border border-slate-200 rounded-lg text-sm text-secondary"
                   />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Lease End</label>
                   <input
                     type="date" value={leaseEnd} onChange={e => setLeaseEnd(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border-transparent rounded-lg text-sm text-white"
+                    className="w-full bg-white border border-slate-200 rounded-lg text-sm text-secondary"
                   />
                 </div>
               </div>
@@ -214,7 +214,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-slate-100 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-0 rounded-lg py-3 px-4 text-sm resize-none transition-all text-white"
+              className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 px-4 text-sm resize-none transition-all text-secondary placeholder-slate-400"
               placeholder={category === 'housing' ? "Describe amenities, roommates, location..." : "Describe the item condition, features, or reasons for selling..."}
               rows={3}
             ></textarea>
@@ -238,7 +238,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                     onClick={() => setListingType(opt.value)}
                     className={`py-3 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${listingType === opt.value
                       ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-slate-200 dark:border-slate-800 text-slate-500 opacity-60'
+                      : 'border-slate-200 text-slate-500 bg-white'
                       }`}
                   >
                     <span className="material-icons-round text-xl">{opt.icon}</span>
@@ -266,7 +266,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                       <input
                         value={startingBid}
                         onChange={(e) => setStartingBid(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-900 border-transparent focus:border-primary focus:ring-0 rounded-lg py-3 pl-8 pr-4 text-sm font-bold text-white"
+                        className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 pl-8 pr-4 text-sm font-bold text-secondary"
                         placeholder="0.00"
                         type="number"
                       />
@@ -283,7 +283,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                       <input
                         value={buyNowPrice}
                         onChange={(e) => setBuyNowPrice(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-900 border-transparent focus:border-primary focus:ring-0 rounded-lg py-3 pl-8 pr-4 text-sm font-bold text-white"
+                        className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 pl-8 pr-4 text-sm font-bold text-secondary"
                         placeholder="0.00"
                         type="number"
                       />
@@ -293,7 +293,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 {listingType !== 'fixed' && (
                   <div>
                     <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Duration</label>
-                    <select className="w-full bg-white dark:bg-slate-900 border-transparent focus:border-primary focus:ring-0 rounded-lg py-3 px-4 text-sm appearance-none text-white">
+                    <select className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 px-4 text-sm appearance-none text-secondary">
                       <option>1 Day</option>
                       <option>3 Days</option>
                       <option>5 Days</option>
@@ -325,7 +325,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                   <input
                     value={buyNowPrice}
                     onChange={(e) => setBuyNowPrice(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border-transparent focus:border-primary focus:ring-0 rounded-lg py-3 pl-8 pr-4 text-sm font-bold text-white"
+                    className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 pl-8 pr-4 text-sm font-bold text-secondary"
                     placeholder="0.00"
                     type="number"
                   />
@@ -335,7 +335,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Per</label>
                 <select
                   value={rentPeriod} onChange={(e) => setRentPeriod(e.target.value as any)}
-                  className="w-full bg-white dark:bg-slate-900 border-transparent focus:border-primary focus:ring-0 rounded-lg py-3 px-2 text-sm text-white"
+                  className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 px-2 text-sm text-secondary"
                 >
                   <option value="month">Month</option>
                   <option value="semester">Semester</option>
@@ -352,7 +352,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3 ml-1">Preferred Payment</label>
             <div className="flex gap-4">
               <button
-                className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === 'cash' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 dark:border-slate-800 text-slate-500 opacity-60'}`}
+                className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === 'cash' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 bg-white text-slate-500'}`}
                 type="button"
                 onClick={() => setPaymentMethod('cash')}
               >
@@ -360,7 +360,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 <span className="text-xs font-black uppercase tracking-widest">Cash</span>
               </button>
               <button
-                className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === 'online' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 dark:border-slate-800 text-slate-500 opacity-60'}`}
+                className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === 'online' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 bg-white text-slate-500'}`}
                 type="button"
                 onClick={() => setPaymentMethod('online')}
               >
@@ -369,7 +369,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
               </button>
             </div>
           </div>
-          <div className="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-xl flex items-center justify-between border border-slate-200 dark:border-slate-800">
+          <div className="bg-slate-50 p-4 rounded-xl flex items-center justify-between border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                 <span className="material-icons-round text-lg">near_me</span>
@@ -389,7 +389,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
         </section>
       </form>
 
-      <footer className="p-4 bg-white dark:bg-[#16212c] border-t border-slate-200 dark:border-slate-800">
+      <footer className="p-4 bg-white border-t border-slate-200">
         <button
           onClick={handlePublish}
           disabled={!isValid || isPublishing}

@@ -233,7 +233,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-background-light dark:bg-background-dark relative flex flex-col shadow-2xl border-x border-slate-200 dark:border-slate-800">
+    <div className="max-w-md mx-auto min-h-screen bg-background-light relative flex flex-col shadow-2xl border-x border-slate-200">
       {renderScreen()}
     </div>
   );

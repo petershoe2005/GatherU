@@ -138,7 +138,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
   };
 
   return (
-    <div className="flex-1 bg-white dark:bg-background-dark flex flex-col min-h-screen relative">
+    <div className="flex-1 bg-white flex flex-col min-h-screen relative">
       {/* Bid Success Toast */}
       {showBidSuccess && (
         <div className="fixed top-8 left-4 right-4 z-[200] max-w-md mx-auto animate-in fade-in slide-in-from-top-10 duration-500">
@@ -222,7 +222,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
           {/* Title & Price */}
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-3">
-              <h1 className="text-xl font-bold leading-tight dark:text-white flex-1">{item.title}</h1>
+              <h1 className="text-xl font-bold leading-tight text-secondary flex-1">{item.title}</h1>
               <div className="flex flex-col items-end shrink-0">
                 <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">
                   {isHousing ? 'Rent' : 'Current Bid'}
@@ -256,44 +256,44 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
             {/* Housing Specific Details */}
             {isHousing && (
               <div className="grid grid-cols-2 gap-3 mt-4">
-                <div className="bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 p-3 rounded-xl">
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Least Start</span>
-                  <span className="text-sm font-bold dark:text-white">{item.lease_start || 'Immediately'}</span>
+                  <span className="text-sm font-bold text-secondary">{item.lease_start || 'Immediately'}</span>
                 </div>
-                <div className="bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 p-3 rounded-xl">
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Lease End</span>
-                  <span className="text-sm font-bold dark:text-white">{item.lease_end || 'Flexible'}</span>
+                  <span className="text-sm font-bold text-secondary">{item.lease_end || 'Flexible'}</span>
                 </div>
-                <div className="bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex items-center gap-2">
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-2">
                   <span className="material-icons-round text-primary text-base">chair</span>
-                  <span className="text-xs font-bold dark:text-white">{item.is_furnished ? 'Furnished' : 'Unfurnished'}</span>
+                  <span className="text-xs font-bold text-secondary">{item.is_furnished ? 'Furnished' : 'Unfurnished'}</span>
                 </div>
-                <div className="bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex items-center gap-2">
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-2">
                   <span className="material-icons-round text-primary text-base">bolt</span>
-                  <span className="text-xs font-bold dark:text-white">{item.utilities_included ? 'Utils Included' : 'Utils Extra'}</span>
+                  <span className="text-xs font-bold text-secondary">{item.utilities_included ? 'Utils Included' : 'Utils Extra'}</span>
                 </div>
               </div>
             )}
           </div>
 
           {/* Description */}
-          <div className="bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Description</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{item.description}</p>
+            <p className="text-sm text-slate-600 leading-relaxed">{item.description}</p>
           </div>
 
           {/* Seller Info */}
-          <div className="bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center gap-4">
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center gap-4">
             <div className="relative w-12 h-12 shrink-0">
               <img className="w-12 h-12 rounded-full object-cover border-2 border-primary/30" src={item.seller.avatar || 'https://picsum.photos/seed/default/100/100'} alt={item.seller.name} />
               {item.seller.isVerified && (
-                <div className="absolute -bottom-0.5 -right-0.5 bg-primary p-0.5 rounded-full border-2 border-white dark:border-surface-dark">
+                <div className="absolute -bottom-0.5 -right-0.5 bg-primary p-0.5 rounded-full border-2 border-white">
                   <span className="material-icons text-white text-[10px]">check</span>
                 </div>
               )}
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-sm dark:text-white">{item.seller.name}</h3>
+              <h3 className="font-bold text-sm text-secondary">{item.seller.name}</h3>
               <p className="text-[11px] text-slate-400">{item.seller.institution || 'University'}</p>
               <div className="flex items-center gap-1 mt-0.5">
                 <span className="text-primary font-bold text-xs">★ {item.seller.rating.toFixed(1)}</span>
@@ -307,7 +307,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
 
           {/* Recent Bids */}
           {recentBids.length > 0 && (
-            <div className="bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Recent Bids</h3>
               <div className="space-y-2">
                 {recentBids.map((bid, i) => (
@@ -325,14 +325,14 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
           {/* Live bidding link */}
           <button
             onClick={onViewLive}
-            className="w-full bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between group hover:border-primary/30 transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between group hover:border-primary/30 transition-all"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                 <span className="material-icons-round">show_chart</span>
               </div>
               <div className="text-left">
-                <p className="font-bold text-sm dark:text-white">Live Bidding Activity</p>
+                <p className="font-bold text-sm text-secondary">Live Bidding Activity</p>
                 <p className="text-[11px] text-slate-400">View price history & charts</p>
               </div>
             </div>
@@ -341,19 +341,19 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
 
           {/* Seller Reviews */}
           {sellerReviews.length > 0 && (
-            <div className="bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Seller Reviews</h3>
               <div className="space-y-3">
                 {sellerReviews.slice(0, 3).map(review => (
-                  <div key={review.id} className="border-b border-slate-100 dark:border-slate-700/50 pb-3 last:border-0 last:pb-0">
+                  <div key={review.id} className="border-b border-slate-100 last:border-0 last:pb-0">
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <img className="w-6 h-6 rounded-full object-cover" src={review.reviewer_avatar || 'https://picsum.photos/seed/reviewer/50/50'} alt="" />
-                        <span className="text-xs font-semibold dark:text-white">{review.reviewer_name}</span>
+                        <span className="text-xs font-semibold text-secondary">{review.reviewer_name}</span>
                       </div>
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3, 4, 5].map(s => (
-                          <span key={s} className={`text-[10px] ${s <= review.rating ? 'text-amber-400' : 'text-slate-300 dark:text-slate-700'}`}>★</span>
+                          <span key={s} className={`text-[10px] ${s <= review.rating ? 'text-amber-400' : 'text-slate-300'}`}>★</span>
                         ))}
                       </div>
                     </div>
@@ -367,7 +367,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
       </div>
 
       {/* Action Footer */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 p-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/90 backdrop-blur-xl border-t border-slate-200 p-4 z-40">
         {isOwner ? (
           <div className="flex gap-3">
             <button

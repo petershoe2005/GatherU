@@ -107,42 +107,42 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
     });
 
   return (
-    <div className="flex-1 bg-background-dark flex flex-col min-h-screen pb-20 font-display">
+    <div className="flex-1 bg-background-light flex flex-col min-h-screen pb-20 font-display">
       {/* Header */}
-      <header className="px-4 pt-12 pb-2 flex items-center justify-between sticky top-0 z-10 bg-background-dark/80 backdrop-blur-md">
+      <header className="px-4 pt-12 pb-2 flex items-center justify-between sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-black bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">GatherU</span>
+          <span className="text-2xl font-black text-secondary tracking-tight">GatherU</span>
           <div
             onClick={onOpenMap}
-            className="flex items-center gap-1 bg-surface-dark/50 border border-white/10 rounded-full px-2 py-1 cursor-pointer hover:bg-surface-dark transition-colors"
+            className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-full px-2 py-1 cursor-pointer hover:bg-slate-200 transition-colors"
           >
             <span className="material-icons-round text-primary text-xs">location_on</span>
-            <span className="text-[10px] text-gray-300 font-bold max-w-[80px] truncate">{userLocation}</span>
+            <span className="text-[10px] text-slate-600 font-bold max-w-[80px] truncate">{userLocation}</span>
           </div>
         </div>
         <div className="relative cursor-pointer" onClick={() => onNavigate(AppScreen.NOTIFICATIONS)}>
-          <span className="material-icons-round text-gray-400 text-2xl hover:text-white transition-colors">notifications</span>
+          <span className="material-icons-round text-slate-400 text-2xl hover:text-secondary transition-colors">notifications</span>
           {unreadNotifications > 0 && (
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background-dark"></span>
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
           )}
         </div>
       </header>
 
       {/* Search & Sort */}
-      <div className="px-4 mb-4 flex gap-2">
+      <div className="px-4 mb-4 flex gap-2 pt-2">
         <div className="flex-1 relative">
-          <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">search</span>
+          <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
           <input
             type="text"
             placeholder={activeCategory === 'housing' ? "Search housing..." : "Search items..."}
-            className="w-full bg-surface-dark border-none rounded-2xl py-3 pl-10 pr-4 text-white text-sm placeholder-gray-500 focus:ring-2 focus:ring-primary/50"
+            className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-slate-900 text-sm placeholder-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <button
           onClick={() => setSortBy(prev => prev === 'newest' ? 'price_low' : prev === 'price_low' ? 'price_high' : 'newest')}
-          className="w-12 h-12 flex items-center justify-center bg-surface-dark rounded-2xl text-gray-400 hover:text-primary transition-colors"
+          className="w-12 h-12 flex items-center justify-center bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-primary hover:border-primary/50 transition-colors shadow-sm"
         >
           <span className="material-icons-round">sort</span>
         </button>
@@ -156,8 +156,8 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full border transition-all ${activeCategory === cat.id
-                ? 'bg-primary text-slate-900 border-primary font-bold shadow-lg shadow-primary/20'
-                : 'bg-surface-dark text-gray-400 border-white/5 hover:border-white/20'
+                ? 'bg-secondary text-white border-secondary font-bold shadow-md shadow-secondary/20'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 shadow-sm'
                 }`}
             >
               <span className="material-icons-round text-sm">{cat.icon}</span>
@@ -180,20 +180,20 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
           <div
             key={item.id}
             onClick={() => onSelectItem(item)}
-            className="group relative bg-surface-dark rounded-2xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all active:scale-[0.98]"
+            className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
           >
             {/* Image */}
-            <div className="aspect-[4/3] bg-gray-800 relative">
+            <div className="aspect-[4/3] bg-slate-100 relative">
               <img
                 src={item.images[0]}
                 alt={item.title}
-                className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                className="w-full h-full object-cover transition-opacity"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
 
               {/* Top badges */}
               <div className="absolute top-3 left-3 flex gap-2">
-                <span className="bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white flex items-center gap-1">
+                <span className="bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-secondary flex items-center gap-1 shadow-sm">
                   <span className="material-icons-round text-[10px] text-primary">near_me</span>
                   {item.distance}
                 </span>
@@ -202,7 +202,7 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
               {/* Favorite Button */}
               <button
                 onClick={(e) => handleToggleFavorite(e, item.id)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/50 transition-colors"
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center hover:bg-white/50 transition-colors shadow-sm"
               >
                 <span className={`material-icons-round text-lg ${favorites.has(item.id) ? 'text-red-500' : 'text-white'}`}>
                   {favorites.has(item.id) ? 'favorite' : 'favorite_border'}
@@ -211,7 +211,7 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
 
               {/* Housing specific badges */}
               {item.category === 'housing' && (
-                <div className="absolute bottom-3 right-3 bg-emerald-500/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white">
+                <div className="absolute bottom-3 right-3 bg-emerald-500 px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm">
                   HOUSING
                 </div>
               )}
@@ -219,7 +219,7 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
 
             {/* Content */}
             <div className="p-4 relative">
-              <h3 className="font-bold text-white text-base leading-tight mb-1">{item.title}</h3>
+              <h3 className="font-bold text-secondary text-base leading-tight mb-1">{item.title}</h3>
 
               {item.category === 'housing' ? (
                 // Housing Layout
@@ -227,16 +227,16 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
                   <div>
                     <div className="text-primary font-black text-xl">
                       ${item.buyNowPrice || item.price}
-                      <span className="text-xs text-gray-400 font-normal ml-1">/{item.rent_period || 'mo'}</span>
+                      <span className="text-xs text-slate-400 font-normal ml-1">/{item.rent_period || 'mo'}</span>
                     </div>
-                    <div className="flex gap-2 mt-1 text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                    <div className="flex gap-2 mt-1 text-[10px] text-slate-500 font-medium uppercase tracking-wider">
                       <span>{item.housing_type || 'Rental'}</span>
                       {item.is_furnished && <span>• Furnished</span>}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-[10px] text-gray-400">Lease Start</div>
-                    <div className="text-xs font-bold text-white">{item.lease_start || 'ASAP'}</div>
+                    <div className="text-[10px] text-slate-400">Lease Start</div>
+                    <div className="text-xs font-bold text-slate-700">{item.lease_start || 'ASAP'}</div>
                   </div>
                 </div>
               ) : (
@@ -248,18 +248,18 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
                     ) : (
                       <>
                         <div className="text-primary font-black text-xl">${item.currentBid}</div>
-                        <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Current Bid</div>
+                        <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Current Bid</div>
                       </>
                     )}
                   </div>
                   <div className="text-right">
                     {item.listing_type !== 'fixed' && (
-                      <div className="text-[10px] text-amber-400 font-bold flex items-center gap-1 justify-end">
+                      <div className="text-[10px] text-orange-600 font-bold flex items-center gap-1 justify-end">
                         <span className="material-icons-round text-[12px]">schedule</span>
                         {item.timeLeft} Left
                       </div>
                     )}
-                    <div className="text-[10px] text-gray-500 mt-0.5">{item.activeBidders} Bids</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">{item.activeBidders} Bids</div>
                   </div>
                 </div>
               )}

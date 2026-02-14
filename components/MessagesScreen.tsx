@@ -94,13 +94,13 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
   };
 
   return (
-    <div className="flex-1 bg-background-dark text-white pb-24 font-display">
-      <header className="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md px-4 pt-12 pb-4 border-b border-border-dark">
+    <div className="flex-1 bg-background-light pb-24 font-display">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md px-4 pt-12 pb-4 border-b border-slate-200">
         {/* Top-level tabs: Chats | Alerts */}
-        <div className="flex p-1 bg-surface-dark rounded-xl mb-3">
+        <div className="flex p-1 bg-slate-100 rounded-xl mb-3 border border-slate-200">
           <button
             onClick={() => setActiveTab('chats')}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-[10px] transition-all flex items-center justify-center gap-1.5 ${activeTab === 'chats' ? 'bg-primary text-slate-900 shadow-md' : 'text-slate-500'
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-[10px] transition-all flex items-center justify-center gap-1.5 ${activeTab === 'chats' ? 'bg-white text-secondary shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700'
               }`}
           >
             <span className="material-icons-round text-[16px]">chat_bubble</span>
@@ -108,7 +108,7 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
           </button>
           <button
             onClick={() => setActiveTab('alerts')}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-[10px] transition-all flex items-center justify-center gap-1.5 relative ${activeTab === 'alerts' ? 'bg-primary text-slate-900 shadow-md' : 'text-slate-500'
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-[10px] transition-all flex items-center justify-center gap-1.5 relative ${activeTab === 'alerts' ? 'bg-white text-secondary shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700'
               }`}
           >
             <span className="material-icons-round text-[16px]">notifications</span>
@@ -123,12 +123,12 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
 
         {/* Sub-filter for chats */}
         {activeTab === 'chats' && (
-          <div className="flex p-1 bg-white/5 rounded-xl">
+          <div className="flex p-1 bg-slate-100 rounded-xl">
             {(['all', 'buying', 'selling'] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`flex-1 py-1.5 text-[11px] font-semibold rounded-lg transition-all capitalize ${filter === f ? 'bg-white/10 text-white' : 'text-slate-500'
+                className={`flex-1 py-1.5 text-[11px] font-semibold rounded-lg transition-all capitalize ${filter === f ? 'bg-white text-secondary shadow-sm' : 'text-slate-500 hover:text-slate-700'
                   }`}
               >
                 {f}
@@ -158,27 +158,27 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-border-dark">
+            <div className="divide-y divide-slate-100">
               {filteredConversations.map(conv => (
                 <div
                   key={conv.id}
                   onClick={() => onOpenChat(conv.id)}
-                  className="flex items-center gap-3 py-4 cursor-pointer hover:bg-white/5 -mx-4 px-4 rounded-xl transition-colors"
+                  className="flex items-center gap-3 py-4 cursor-pointer hover:bg-slate-50 -mx-4 px-4 rounded-xl transition-colors"
                 >
                   <div className="relative w-12 h-12 shrink-0">
                     <img
-                      className="w-12 h-12 rounded-full object-cover border-2 border-slate-700"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-slate-100"
                       src={conv.other_user?.avatar_url || 'https://picsum.photos/seed/conv' + conv.id + '/100/100'}
                       alt={conv.other_user?.name || 'User'}
                     />
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-primary rounded-full border-2 border-background-dark"></div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-primary rounded-full border-2 border-white"></div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline">
-                      <h3 className="font-semibold text-sm truncate">{conv.other_user?.name || 'Unknown'}</h3>
-                      <span className="text-[10px] text-slate-500 shrink-0 ml-2">{formatTime(conv.last_message_at)}</span>
+                      <h3 className="font-semibold text-sm truncate text-secondary">{conv.other_user?.name || 'Unknown'}</h3>
+                      <span className="text-[10px] text-slate-400 shrink-0 ml-2">{formatTime(conv.last_message_at)}</span>
                     </div>
-                    <p className="text-xs text-slate-400 truncate mt-0.5">{conv.last_message || 'No messages yet'}</p>
+                    <p className="text-xs text-slate-500 truncate mt-0.5">{conv.last_message || 'No messages yet'}</p>
                     {conv.item && (
                       <p className="text-[10px] text-primary font-medium mt-0.5 truncate">
                         📦 {typeof conv.item === 'object' && conv.item.title ? conv.item.title : 'Item'}
@@ -206,17 +206,17 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
                     key={notif.id}
                     onClick={() => !notif.read && handleMarkRead(notif.id)}
                     className={`flex items-start gap-3 p-3 rounded-xl transition-all cursor-pointer ${notif.read
-                      ? 'bg-surface-dark/50 opacity-60'
-                      : 'bg-surface-dark border border-primary/10 hover:border-primary/30'
+                      ? 'bg-slate-50 opacity-60'
+                      : 'bg-white border border-slate-200 hover:border-primary/30 shadow-sm'
                       }`}
                   >
-                    <div className={`w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 ${color}`}>
+                    <div className={`w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 ${color}`}>
                       <span className="material-icons-round text-lg">{icon}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold leading-tight">{notif.title}</p>
+                          <p className="text-sm font-semibold leading-tight text-secondary">{notif.title}</p>
                           {notif.body && (
                             <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{notif.body}</p>
                           )}

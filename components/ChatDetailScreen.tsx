@@ -91,11 +91,11 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background-dark min-h-screen">
+    <div className="flex-1 flex flex-col bg-slate-50 min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md px-4 py-3 border-b border-border-dark flex items-center gap-3">
-        <button onClick={onBack} className="p-2 rounded-full hover:bg-white/5 transition-colors">
-          <span className="material-icons-round text-white">arrow_back</span>
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md px-4 py-3 border-b border-slate-200 flex items-center gap-3">
+        <button onClick={onBack} className="p-2 rounded-full hover:bg-slate-100 transition-colors">
+          <span className="material-icons-round text-secondary">arrow_back</span>
         </button>
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="relative shrink-0">
@@ -106,18 +106,18 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
                 alt={otherUser.name}
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
-                <span className="material-icons-round text-slate-300">person</span>
+              <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
+                <span className="material-icons-round text-slate-400">person</span>
               </div>
             )}
             {otherUser?.is_verified && (
-              <div className="absolute -bottom-0.5 -right-0.5 bg-primary p-0.5 rounded-full border-2 border-background-dark">
+              <div className="absolute -bottom-0.5 -right-0.5 bg-primary p-0.5 rounded-full border-2 border-white">
                 <span className="material-icons text-white text-[8px]">check</span>
               </div>
             )}
           </div>
           <div className="min-w-0">
-            <h2 className="font-semibold text-sm text-white truncate">{otherUser?.name || 'Chat'}</h2>
+            <h2 className="font-semibold text-sm text-secondary truncate">{otherUser?.name || 'Chat'}</h2>
             {chatItem ? (
               <p className="text-[10px] text-slate-400 truncate">
                 Re: {(chatItem as any).title || 'Item'}
@@ -129,12 +129,12 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
         </div>
         {chatItem && (chatItem as any).images?.[0] && (
           <img
-            className="w-9 h-9 rounded-lg object-cover border border-border-dark shrink-0"
+            className="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0"
             src={(chatItem as any).images[0]}
             alt=""
           />
         )}
-        <button className="p-2 rounded-full hover:bg-white/5 transition-colors">
+        <button className="p-2 rounded-full hover:bg-slate-100 transition-colors">
           <span className="material-icons-round text-slate-400">more_vert</span>
         </button>
       </header>
@@ -147,7 +147,7 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
           </div>
         ) : messages.length === 0 ? (
           <div className="text-center py-20 opacity-30">
-            <span className="material-icons text-4xl mb-2">chat_bubble_outline</span>
+            <span className="material-icons text-4xl mb-2 text-slate-300">chat_bubble_outline</span>
             <p className="text-xs text-slate-400">No messages yet. Start the conversation!</p>
           </div>
         ) : (
@@ -169,12 +169,12 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
               <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[75%] ${isMe ? 'order-last' : ''}`}>
                   <div className={`px-4 py-3 rounded-2xl ${isMe
-                    ? 'bg-primary text-slate-900 rounded-br-sm'
-                    : 'bg-surface-dark border border-border-dark text-white rounded-bl-sm'
+                    ? 'bg-primary text-slate-900 rounded-br-sm shadow-sm'
+                    : 'bg-white border border-slate-200 text-secondary rounded-bl-sm shadow-sm'
                     }`}>
                     <p className="text-sm leading-relaxed">{msg.text}</p>
                   </div>
-                  <p className={`text-[10px] text-slate-500 mt-1 ${isMe ? 'text-right' : 'text-left'} px-1`}>
+                  <p className={`text-[10px] text-slate-400 mt-1 ${isMe ? 'text-right' : 'text-left'} px-1`}>
                     {formatTime(msg.created_at)}
                   </p>
                 </div>
@@ -186,7 +186,7 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
       </div>
 
       {/* Input */}
-      <div className="sticky bottom-0 bg-background-dark/90 backdrop-blur-xl border-t border-border-dark p-4">
+      <div className="sticky bottom-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 p-4">
         <div className="flex items-end gap-2">
           <button className="p-2 rounded-full text-slate-400 hover:text-primary transition-colors shrink-0">
             <span className="material-icons-round">add_circle</span>
@@ -196,7 +196,7 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={handleKeyPress}
-              className="w-full bg-surface-dark border border-border-dark rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary text-white placeholder-slate-500 transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary text-secondary placeholder-slate-400 transition-colors"
               placeholder="Type a message..."
               type="text"
             />
@@ -204,7 +204,7 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
           <button
             onClick={handleSend}
             disabled={!newMessage.trim()}
-            className="p-3 bg-primary rounded-full text-slate-900 active:scale-90 transition-all disabled:opacity-40 shrink-0"
+            className="p-3 bg-primary rounded-full text-slate-900 active:scale-90 transition-all disabled:opacity-40 shrink-0 shadow-lg shadow-primary/20"
           >
             <span className="material-icons-round text-lg">send</span>
           </button>

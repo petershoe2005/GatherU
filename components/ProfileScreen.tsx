@@ -24,9 +24,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex-1 bg-background-dark text-white pb-24 font-display">
+    <div className="flex-1 bg-background-light pb-24 font-display">
       {/* Profile Header */}
-      <div className="relative bg-gradient-to-b from-primary/20 via-background-dark to-background-dark pt-12 pb-6 px-6">
+      <div className="relative bg-gradient-to-b from-secondary to-slate-900 pt-12 pb-6 px-6 text-white">
         <div className="flex items-center gap-4">
           <div className="relative">
             <img
@@ -52,17 +52,17 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onNavigate }) => {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mt-6">
-          <div className="bg-surface-dark border border-border-dark rounded-xl p-3 text-center">
+          <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center">
             <p className="text-lg font-black text-primary">{stats.itemsSold}</p>
-            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Sold</p>
+            <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest">Sold</p>
           </div>
-          <div className="bg-surface-dark border border-border-dark rounded-xl p-3 text-center">
+          <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center">
             <p className="text-lg font-black text-primary">{stats.activeBids}</p>
-            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Bids</p>
+            <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest">Bids</p>
           </div>
-          <div className="bg-surface-dark border border-border-dark rounded-xl p-3 text-center">
+          <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center">
             <p className="text-lg font-black text-amber-400">★ {(profile?.rating || stats.rating || 0).toFixed(1)}</p>
-            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Rating</p>
+            <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest">Rating</p>
           </div>
         </div>
       </div>
@@ -79,16 +79,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onNavigate }) => {
           <button
             key={item.label}
             onClick={() => onNavigate(item.screen)}
-            className="w-full bg-surface-dark border border-border-dark rounded-2xl p-4 flex items-center gap-4 hover:border-primary/30 transition-all text-left"
+            className="w-full bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-primary/30 transition-all text-left shadow-sm hover:shadow-md"
           >
-            <div className={`w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center ${item.color}`}>
+            <div className={`w-11 h-11 rounded-xl bg-slate-50 flex items-center justify-center ${item.color}`}>
               <span className="material-icons-round">{item.icon}</span>
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-sm">{item.label}</p>
+              <p className="font-semibold text-sm text-secondary">{item.label}</p>
               <p className="text-[11px] text-slate-500">{item.desc}</p>
             </div>
-            <span className="material-icons-round text-slate-600">chevron_right</span>
+            <span className="material-icons-round text-slate-400">chevron_right</span>
           </button>
         ))}
 

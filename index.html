@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -18,13 +18,17 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#0df2f2",
-                        "background-light": "#f5f8f8",
-                        "background-dark": "#102222",
-                        "surface-dark": "#1a2a2a",
-                        "card-dark": "#1c2e2e",
-                        "success": "#0df2f2",
-                        "error": "#ff4d4d",
+                        "primary": "#FF6B00", /* Vibrant Orange */
+                        "primary-light": "#FF9F2E", /* Lighter Orange for gradients */
+                        "secondary": "#0F172A", /* Navy Blue */
+                        "background-light": "#F8FAFC", /* Slate 50 */
+                        "background-dark": "#0F172A", /* Navy Blue as dark bg if needed */
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E293B", /* Slate 800 */
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#334155",
+                        "success": "#10B981",
+                        "error": "#EF4444",
                     },
                     fontFamily: {
                         "display": ["Spline Sans", "sans-serif"]
@@ -43,7 +47,7 @@
         body {
             font-family: 'Spline Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            background-color: #102222;
+            background-color: #F8FAFC;
         }
 
         .hide-scrollbar::-webkit-scrollbar {

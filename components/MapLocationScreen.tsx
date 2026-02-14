@@ -105,11 +105,11 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background-dark h-screen overflow-hidden">
+    <div className="flex-1 flex flex-col bg-slate-50 h-screen overflow-hidden">
       {/* Search Header */}
-      <div className="p-4 bg-background-dark/80 backdrop-blur-md z-[1000] border-b border-white/5 space-y-3 relative">
+      <div className="p-4 bg-white/90 backdrop-blur-md z-[1000] border-b border-slate-200 space-y-3 relative">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white active:scale-90 transition-transform">
+          <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-secondary active:scale-90 transition-transform">
             <span className="material-icons">arrow_back</span>
           </button>
           <div className="relative flex-1">
@@ -117,7 +117,7 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary outline-none text-white placeholder-slate-500"
+              className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary outline-none text-secondary placeholder-slate-400 shadow-sm"
               placeholder="Search campus or city..."
               type="text"
             />
@@ -140,8 +140,8 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
                 key={loc.name}
                 onClick={() => { setSelectedLoc(loc); setCustomPin(null); setSearchQuery(''); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${selectedLoc.name === loc.name
-                    ? 'bg-primary text-slate-900 border-primary'
-                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-primary/50'
+                  ? 'bg-primary text-slate-900 border-primary shadow-md'
+                  : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 shadow-sm'
                   }`}
               >
                 {loc.name}
@@ -158,11 +158,11 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
           zoom={14}
           className="w-full h-full"
           zoomControl={false}
-          style={{ background: '#1a2a2a' }}
+          style={{ background: '#f8fafc' }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
           <FlyToLocation lat={selectedLoc.lat} lng={selectedLoc.lng} />
           <MapClickHandler onMapClick={handleMapClick} />
@@ -199,21 +199,20 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
 
         {/* Loading Overlay */}
         {isReverseGeocoding && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-slate-900/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-semibold border border-primary/30 flex items-center gap-2">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-md text-secondary px-4 py-2 rounded-full text-xs font-semibold border border-primary/30 flex items-center gap-2 shadow-lg">
             <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             Getting location name...
           </div>
         )}
 
-        {/* Selected Location Card */}
         <div className="absolute bottom-4 left-4 right-4 z-[1000] animate-in slide-in-from-bottom-10 duration-500">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl flex items-center gap-4">
+          <div className="bg-white/90 backdrop-blur-xl border border-slate-200 rounded-2xl p-4 shadow-2xl flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
               <span className="material-icons text-2xl">explore</span>
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-white truncate">{selectedLoc.name}</h3>
-              <p className="text-xs text-slate-400 truncate">{selectedLoc.desc} • Tap map to pin</p>
+              <h3 className="font-bold text-secondary truncate">{selectedLoc.name}</h3>
+              <p className="text-xs text-slate-500 truncate">{selectedLoc.desc} • Tap map to pin</p>
             </div>
             <button
               onClick={handleSetLocation}
