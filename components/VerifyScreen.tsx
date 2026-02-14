@@ -151,10 +151,13 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
                 <input
                   key={idx}
                   id={`code-${idx}`}
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
                   value={digit}
                   onChange={(e) => handleCodeChange(idx, e.target.value)}
-                  className="w-12 h-16 text-center text-2xl font-black bg-slate-900/80 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white"
+                  className="w-12 h-16 text-center text-2xl font-black bg-slate-900/80 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white caret-white"
+                  style={{ color: 'white', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
                   autoFocus={idx === 0}
                 />
               ))}
