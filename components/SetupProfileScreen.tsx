@@ -36,7 +36,6 @@ const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) =
       username,
       is_verified: true,
       institution: schoolName,
-      school_name: schoolName,
     });
 
     if (!error) {

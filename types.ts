@@ -39,7 +39,6 @@ export interface Profile {
   email: string;
   avatar_url: string;
   institution: string;
-  school_name?: string;
   rating: number;
   reviews_count: number;
   is_verified: boolean;
@@ -147,7 +146,7 @@ export function profileToUser(profile: Profile): User {
     rating: profile.rating,
     reviewsCount: profile.reviews_count,
     isVerified: profile.is_verified,
-    institution: profile.school_name || profile.institution || 'University',
+    institution: profile.institution || 'University',
     avatar: profile.avatar_url || 'https://picsum.photos/seed/default/100/100',
   };
 }
