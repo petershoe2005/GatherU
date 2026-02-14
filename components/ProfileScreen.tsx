@@ -12,6 +12,7 @@ interface ProfileScreenProps {
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ onNavigate }) => {
   const { profile, signOut } = useAuth();
   const [stats, setStats] = useState({ itemsSold: 0, activeBids: 0, rating: 0 });
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -19,8 +20,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onNavigate }) => {
     }
   }, [profile]);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = async () => {
     await signOut();
+    setShowLogoutConfirm(false);
+    onNavigate(AppScreen.LOGIN);
   };
 
   return (
@@ -102,6 +109,35 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onNavigate }) => {
       </div>
 
       <BottomNav currentScreen={AppScreen.PROFILE} onNavigate={onNavigate} />
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <span className="material-icons-round text-red-500 text-2xl">logout</span>
+            </div>
+            <h3 className="text-lg font-black text-slate-900 text-center mb-2">Sign Out?</h3>
+            <p className="text-slate-500 text-center text-sm mb-6">
+              Are you sure you want to sign out? You will need to log in again to access your account.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="py-3 px-4 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="py-3 px-4 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all active:scale-95"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

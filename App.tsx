@@ -47,15 +47,21 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     if (loading) return;
     if (!session) {
-      setCurrentScreen(AppScreen.VERIFY);
-      pushRoute(AppScreen.VERIFY);
+      // Allow user to be on LOGIN screen even if not authenticated
+      const { screen } = parseHash();
+      if (screen === AppScreen.LOGIN) {
+        setCurrentScreen(AppScreen.LOGIN);
+      } else {
+        setCurrentScreen(AppScreen.VERIFY);
+        pushRoute(AppScreen.VERIFY);
+      }
     } else if (profile && !profile.name) {
       setCurrentScreen(AppScreen.SETUP_PROFILE);
       pushRoute(AppScreen.SETUP_PROFILE);
     } else if (session) {
       // Check if URL has a valid hash route
       const { screen } = parseHash();
-      if (screen !== AppScreen.VERIFY && screen !== AppScreen.SETUP_PROFILE) {
+      if (screen !== AppScreen.VERIFY && screen !== AppScreen.SETUP_PROFILE && screen !== AppScreen.LOGIN) {
         setCurrentScreen(screen);
       } else {
         setCurrentScreen(AppScreen.FEED);

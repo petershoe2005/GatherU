@@ -8,6 +8,7 @@ interface RouteState {
 
 const SCREEN_ROUTES: Record<AppScreen, string> = {
     [AppScreen.VERIFY]: '/verify',
+    [AppScreen.LOGIN]: '/login',
     [AppScreen.SETUP_PROFILE]: '/setup',
     [AppScreen.FEED]: '/',
     [AppScreen.DETAILS]: '/item',
