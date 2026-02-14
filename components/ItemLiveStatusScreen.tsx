@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { Item, Bid } from '../types';
 import { fetchBidsForItem, subscribeToBids } from '../services/bidsService';
 
@@ -10,6 +11,7 @@ interface ItemLiveStatusScreenProps {
 }
 
 const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBack, onEndBidding }) => {
+  const { user } = useAuth();
   const [currentPrice, setCurrentPrice] = useState(item.currentBid);
   const [bids, setBids] = useState<Bid[]>([]);
   const [priceHistory, setPriceHistory] = useState<{ price: number; time: string }[]>([
@@ -157,8 +159,8 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
           )}
         </div>
 
-        {/* End Auction Button (for owner) */}
-        {!isEnded && (
+        {/* End Auction Button (for owner only) */}
+        {!isEnded && user?.id === item.seller_id && (
           <button
             onClick={onEndBidding}
             className="w-full bg-red-500/10 text-red-500 font-bold py-4 rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2"
