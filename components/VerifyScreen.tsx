@@ -14,7 +14,7 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
   const { signInWithOtp, verifyOtp } = useAuth();
   const [stage, setStage] = useState<VerifyStage>('email');
   const [email, setEmail] = useState('');
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [code, setCode] = useState(['', '', '', '', '', '', '', '']);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -38,7 +38,7 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
 
   const handleVerifyCode = async () => {
     const enteredCode = code.join('');
-    if (enteredCode.length < 6) return;
+    if (enteredCode.length < 8) return;
 
     setIsProcessing(true);
     setErrorMsg('');
@@ -60,7 +60,7 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
     setCode(newCode);
 
     // Auto-focus next input
-    if (value && index < 5) {
+    if (value && index < 7) {
       const nextInput = document.getElementById(`code-${index + 1}`);
       nextInput?.focus();
     }
@@ -156,7 +156,7 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleCodeChange(idx, e.target.value)}
-                  className="w-12 h-16 text-center text-2xl font-black bg-slate-900/80 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white caret-white"
+                  className="w-10 h-14 text-center text-xl font-black bg-slate-900/80 border border-white/10 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white caret-white"
                   style={{ color: 'white', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}
                   autoFocus={idx === 0}
                 />
