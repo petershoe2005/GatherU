@@ -1,12 +1,20 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "AIzaSyDiYKf-wOQL1KV9I8uOhW43XQqHb8thKjs" });
+let ai: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (!ai && process.env.API_KEY) {
+    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  }
+  return new GoogleGenAI({ apiKey: process.env.API_KEY || "AIzaSyDiYKf-wOQL1KV9I8uOhW43XQqHb8thKjs" });
+};
 
 export const getSmartDescription = async (itemTitle: string) => {
-  if (!process.env.API_KEY) return null;
+  const client = getAI();
+  if (!client) return null;
   try {
-    const response = await ai.models.generateContent({
+    const response = await client.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `Write a compelling 2-sentence description for a campus listing of "${itemTitle}". Mention it's perfect for students.`,
     });
@@ -18,9 +26,10 @@ export const getSmartDescription = async (itemTitle: string) => {
 };
 
 export const getSmartSearchHelp = async (query: string) => {
-  if (!process.env.API_KEY) return null;
+  const client = getAI();
+  if (!client) return null;
   try {
-    const response = await ai.models.generateContent({
+    const response = await client.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `The user is searching for "${query}" in a campus marketplace. Suggest 3 related specific items students might need. Return as a comma-separated list.`,
     });
