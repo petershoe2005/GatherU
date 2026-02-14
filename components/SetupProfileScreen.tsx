@@ -11,12 +11,19 @@ const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) =
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !username || !password) return;
+    if (!name || !username || !password || !confirmPassword) return;
+
+    if (password !== confirmPassword) {
+      setErrorMsg('Passwords do not match.');
+      return;
+    }
 
     setIsSubmitting(true);
     setErrorMsg('');
@@ -116,6 +123,33 @@ const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) =
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="block w-full pl-11 pr-12 py-4 bg-slate-900/50 border border-white/5 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-600 font-medium"
+              placeholder="••••••••"
+              type={showPassword ? "text" : "password"}
+              minLength={6}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-white transition-colors"
+            >
+              <span className="material-icons text-lg">{showPassword ? 'visibility_off' : 'visibility'}</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">
+            Confirm Password
+          </label>
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-primary transition-colors">
+              <span className="material-icons text-lg">lock_reset</span>
+            </div>
+            <input
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="block w-full pl-11 pr-4 py-4 bg-slate-900/50 border border-white/5 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-600 font-medium"
               placeholder="••••••••"
               type="password"
@@ -126,7 +160,7 @@ const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) =
 
         <button
           type="submit"
-          disabled={isSubmitting || !name || !username || !password}
+          disabled={isSubmitting || !name || !username || !password || !confirmPassword}
           className="w-full bg-primary hover:bg-primary/90 text-slate-900 font-black py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 mt-4"
         >
           {isSubmitting ? (
