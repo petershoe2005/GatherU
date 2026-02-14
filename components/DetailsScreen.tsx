@@ -433,7 +433,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
                     value={bidAmount}
                     onChange={(e) => setBidAmount(parseFloat(e.target.value) || 0)}
                     min={currentBid + 1}
-                    className="w-full pl-7 pr-3 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary text-white"
+                    className="w-full pl-7 pr-3 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary text-slate-900"
                   />
                 </div>
               </div>
