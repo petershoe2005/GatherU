@@ -14,7 +14,7 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
   const { signInWithOtp, verifyOtp } = useAuth();
   const [stage, setStage] = useState<VerifyStage>('email');
   const [email, setEmail] = useState('');
-  const [code, setCode] = useState(['', '', '', '', '', '', '', '']);
+  const [code, setCode] = useState(['', '', '', '', '', '']);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -38,7 +38,7 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
 
   const handleVerifyCode = async () => {
     const enteredCode = code.join('');
-    if (enteredCode.length < 8) return;
+    if (enteredCode.length < 6) return;
 
     setIsProcessing(true);
     setErrorMsg('');
@@ -60,7 +60,7 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
     setCode(newCode);
 
     // Auto-focus next input
-    if (value && index < 7) {
+    if (value && index < 5) {
       const nextInput = document.getElementById(`code-${index + 1}`);
       nextInput?.focus();
     }
