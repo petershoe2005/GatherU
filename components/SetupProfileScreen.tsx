@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { getSchoolNameFromEmail } from '../lib/universityUtils';
 
 interface SetupProfileScreenProps {
   onComplete: (data: { name: string; username: string }) => void;
 }
 
 const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) => {
-  const { updateProfile, updatePassword } = useAuth();
+  const { user, updateProfile, updatePassword } = useAuth();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -28,11 +29,14 @@ const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) =
     setIsSubmitting(true);
     setErrorMsg('');
 
+    const schoolName = getSchoolNameFromEmail(user?.email || '');
+
     const { error } = await updateProfile({
       name,
       username,
       is_verified: true,
-      institution: 'University',
+      institution: schoolName,
+      school_name: schoolName,
     });
 
     if (!error) {
