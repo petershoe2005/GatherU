@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": ". $HOME/.nvm/nvm.sh && nvm use 20 --silent && vite",
-    "build": ". $HOME/.nvm/nvm.sh && nvm use 20 --silent && vite build",
-    "preview": ". $HOME/.nvm/nvm.sh && nvm use 20 --silent && vite preview"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@google/genai": "^1.40.0",
