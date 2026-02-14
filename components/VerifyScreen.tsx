@@ -73,8 +73,10 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }
 
       <div className="relative w-32 h-32 mb-10 transition-transform duration-700 hover:scale-110">
         <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="relative flex items-center justify-center w-full h-full bg-slate-900 border border-primary/30 rounded-full shadow-2xl overflow-hidden p-2">
-          <img src="/logo.png" alt="GatherU Logo" className="w-full h-full object-contain" />
+        <div className="relative flex items-center justify-center w-full h-full bg-slate-900 border border-primary/30 rounded-full shadow-2xl">
+          <span className="material-icons text-primary text-5xl">
+            {stage === 'email' ? 'school' : 'mark_email_unread'}
+          </span>
         </div>
       </div>
 
