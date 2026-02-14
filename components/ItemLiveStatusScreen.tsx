@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Item, Bid } from '../types';
 import { fetchBidsForItem, subscribeToBids } from '../services/bidsService';
+import PriceChart from './PriceChart';
 
 interface ItemLiveStatusScreenProps {
   item: Item;
@@ -74,8 +75,9 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
         </button>
         <h1 className="text-lg font-bold">Live Auction</h1>
         <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${isEnded ? 'bg-red-500/20 text-red-400' : 'bg-primary/20 text-primary'}`}>
-          {isEnded ? 'Ended' : '● Live'}
-        </div>
+          <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${isEnded ? 'bg-red-500/20 text-red-400' : 'bg-primary/20 text-primary animate-blink'}`}>
+            {isEnded ? 'Ended' : '● Live'}
+          </div>
       </header>
 
       <div className="px-4 space-y-6 pb-24">
@@ -92,22 +94,11 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
         </div>
 
         {/* Price Chart */}
-        <div className="bg-surface-dark border border-border-dark rounded-2xl p-4">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Price History</h3>
-          <div className="h-40 flex items-end gap-1">
-            {priceHistory.map((point, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-[8px] text-primary font-bold">${point.price.toFixed(0)}</span>
-                <div
-                  className="w-full bg-primary/30 rounded-t-md transition-all duration-500 min-h-[4px]"
-                  style={{ height: `${(point.price / maxPrice) * 100}%` }}
-                >
-                  <div className="w-full h-full bg-gradient-to-t from-primary/50 to-primary rounded-t-md"></div>
-                </div>
-                <span className="text-[7px] text-slate-500 truncate max-w-full">{point.time}</span>
-              </div>
-            ))}
+        <div className="bg-surface-dark border border-border-dark rounded-2xl overflow-hidden">
+          <div className="p-4 border-b border-border-dark bg-slate-800/50">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Live Market Activity</h3>
           </div>
+          <PriceChart data={priceHistory} height={220} />
         </div>
 
         {/* Stats */}
