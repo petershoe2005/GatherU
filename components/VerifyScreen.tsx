@@ -5,11 +5,12 @@ import { useAuth } from '../contexts/AuthContext';
 interface VerifyScreenProps {
   onVerify: () => void;
   onSkip: () => void;
+  onLogin: () => void;
 }
 
 type VerifyStage = 'email' | 'code';
 
-const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip }) => {
+const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip, onLogin }) => {
   const { signInWithOtp, verifyOtp } = useAuth();
   const [stage, setStage] = useState<VerifyStage>('email');
   const [email, setEmail] = useState('');
@@ -134,6 +135,14 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onSkip }) => {
                 </>
               )}
             </button>
+            <div className="text-center pt-2">
+              <button
+                onClick={onLogin}
+                className="text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-primary transition-colors"
+              >
+                Already verified? Log In
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">

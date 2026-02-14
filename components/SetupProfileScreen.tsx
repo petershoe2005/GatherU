@@ -7,15 +7,16 @@ interface SetupProfileScreenProps {
 }
 
 const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) => {
-  const { updateProfile } = useAuth();
+  const { updateProfile, updatePassword } = useAuth();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !username) return;
+    if (!name || !username || !password) return;
 
     setIsSubmitting(true);
     setErrorMsg('');
@@ -26,6 +27,10 @@ const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) =
       is_verified: true,
       institution: 'University',
     });
+
+    if (!error) {
+      await updatePassword(password);
+    }
 
     setIsSubmitting(false);
 
@@ -99,9 +104,29 @@ const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) =
           </div>
         </div>
 
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">
+            Create Password
+          </label>
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-primary transition-colors">
+              <span className="material-icons text-lg">lock</span>
+            </div>
+            <input
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="block w-full pl-11 pr-4 py-4 bg-slate-900/50 border border-white/5 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-600 font-medium"
+              placeholder="••••••••"
+              type="password"
+              minLength={6}
+            />
+          </div>
+        </div>
+
         <button
           type="submit"
-          disabled={isSubmitting || !name || !username}
+          disabled={isSubmitting || !name || !username || !password}
           className="w-full bg-primary hover:bg-primary/90 text-slate-900 font-black py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 mt-4"
         >
           {isSubmitting ? (
@@ -113,12 +138,12 @@ const SetupProfileScreen: React.FC<SetupProfileScreenProps> = ({ onComplete }) =
             </>
           )}
         </button>
-      </form>
+      </form >
 
       <div className="mt-8 text-center opacity-50">
         <p className="text-[10px] font-bold uppercase tracking-widest">Step 2 of 2: Profile Details</p>
       </div>
-    </div>
+    </div >
   );
 };
 

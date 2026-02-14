@@ -12,6 +12,8 @@ interface AuthContextType {
     verifyOtp: (email: string, token: string) => Promise<{ error: any }>;
     signOut: () => Promise<void>;
     updateProfile: (data: Partial<Profile>) => Promise<{ error: any }>;
+    updatePassword: (password: string) => Promise<{ error: any }>;
+    signInWithPassword: (email: string, password: string) => Promise<{ error: any }>;
     refreshProfile: () => Promise<void>;
 }
 
@@ -106,6 +108,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return { error };
     };
 
+    const updatePassword = async (password: string) => {
+        const { error } = await supabase.auth.updateUser({ password });
+        return { error };
+    };
+
+    const signInWithPassword = async (email: string, password: string) => {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        return { error };
+    };
+
     const verifyOtp = async (email: string, token: string) => {
         const { error } = await supabase.auth.verifyOtp({
             email,
@@ -147,6 +159,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 verifyOtp,
                 signOut,
                 updateProfile,
+                updatePassword,
+                signInWithPassword,
                 refreshProfile,
             }}
         >

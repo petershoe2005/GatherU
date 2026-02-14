@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { fetchItems, subscribeToItems } from './services/itemsService';
 import { pushRoute, parseHash, onRouteChange } from './lib/router';
 import VerifyScreen from './components/VerifyScreen';
+import LoginScreen from './components/LoginScreen';
 import SetupProfileScreen from './components/SetupProfileScreen';
 import FeedScreen from './components/FeedScreen';
 import DetailsScreen from './components/DetailsScreen';
@@ -140,7 +141,9 @@ const AppContent: React.FC = () => {
   const renderScreen = () => {
     switch (currentScreen) {
       case AppScreen.VERIFY:
-        return <VerifyScreen onVerify={handleVerify} onSkip={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }} />;
+        return <VerifyScreen onVerify={handleVerify} onSkip={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }} onLogin={() => { setCurrentScreen(AppScreen.LOGIN); pushRoute(AppScreen.LOGIN); }} />;
+      case AppScreen.LOGIN:
+        return <LoginScreen onLoginSuccess={handleProfileComplete} onBack={() => { setCurrentScreen(AppScreen.VERIFY); pushRoute(AppScreen.VERIFY); }} />;
       case AppScreen.SETUP_PROFILE:
         return <SetupProfileScreen onComplete={handleProfileComplete} />;
       case AppScreen.FEED:

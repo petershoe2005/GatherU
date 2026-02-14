@@ -1,6 +1,7 @@
 
 export enum AppScreen {
   VERIFY = 'verify',
+  LOGIN = 'login',
   SETUP_PROFILE = 'setup_profile',
   FEED = 'feed',
   DETAILS = 'details',
