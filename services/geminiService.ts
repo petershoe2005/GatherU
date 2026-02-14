@@ -1,7 +1,7 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "AIzaSyDiYKf-wOQL1KV9I8uOhW43XQqHb8thKjs" });
 
 export const getSmartDescription = async (itemTitle: string) => {
   if (!process.env.API_KEY) return null;
