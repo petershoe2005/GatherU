@@ -13,17 +13,25 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
     <style>
         :root {
-            --primary: #00D4AA;
-            --primary-dim: #00D4AA33;
-            --bg: #0B1120;
-            --bg-card: #111B2E;
-            --bg-card-hover: #162033;
-            --text: #E2E8F0;
-            --text-dim: #64748B;
+            /* ─── Palette (Orange Theme) ─── */
+            --primary: #FF6B00;
+            --primary-dim: rgba(255, 107, 0, 0.15);
+            /* Orange with opacity */
+
+            /* Backgrounds (Navy Blue) */
+            --bg: #0F172A;
+            --bg-card: #1E293B;
+            --bg-card-hover: #334155;
+
+            --text: #F8FAFC;
+            --text-dim: #94A3B8;
+
+            /* Accents - Adjusted for Navy/Orange theme */
             --accent-purple: #8B5CF6;
-            --accent-blue: #3B82F6;
+            --accent-blue: #06B6D4;
             --accent-rose: #F43F5E;
             --accent-amber: #F59E0B;
+
             --slide-transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -639,9 +647,9 @@
                 </p>
                 <div class="reveal delay-3 flex-row gap-2 items-center" style="margin-top:16px">
                     <div
-                        style="width:48px;height:48px;border-radius:14px;overflow:hidden;border:2px solid rgba(0,212,170,0.3)">
-                        <img src="gatheru_logo_1770931891227.png" alt="GatherU"
-                            style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'" />
+                        style="width:48px;height:48px;border-radius:14px;overflow:hidden;border:2px solid var(--primary-dim)">
+                        <img src="GatherU_Logo_Orange.png" alt="GatherU" style="width:100%;height:100%;object-fit:cover"
+                            onerror="this.style.display='none'" />
                     </div>
                     <div style="text-align:left">
                         <div style="font-weight:800;font-size:1.1rem" class="font-display">GatherU</div>
@@ -1292,6 +1300,21 @@
         const slides = document.querySelectorAll('.slide');
         const total = slides.length;
         let current = 0;
+
+        // Check URL param for slide index
+        const urlParams = new URLSearchParams(window.location.search);
+        const slideParam = urlParams.get('slide');
+        if (slideParam) {
+            const idx = parseInt(slideParam);
+            if (!isNaN(idx) && idx >= 0 && idx < total) {
+                current = idx;
+                // Force active class on load
+                slides.forEach((s, i) => {
+                    s.classList.toggle('active', i === current);
+                    s.classList.remove('exit'); // Clear any exit states
+                });
+            }
+        }
 
         // Build dots
         const dotsContainer = document.getElementById('dots');

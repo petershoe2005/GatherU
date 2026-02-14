@@ -74,10 +74,10 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
           <span className="material-icons-round text-white">arrow_back</span>
         </button>
         <h1 className="text-lg font-bold">Live Auction</h1>
-        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${isEnded ? 'bg-red-500/20 text-red-400' : 'bg-primary/20 text-primary'}`}>
-          <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${isEnded ? 'bg-red-500/20 text-red-400' : 'bg-primary/20 text-primary animate-blink'}`}>
-            {isEnded ? 'Ended' : '● Live'}
-          </div>
+
+        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${isEnded ? 'bg-red-500/20 text-red-400' : 'bg-primary/20 text-primary animate-blink'}`}>
+          {isEnded ? 'Ended' : '● Live'}
+        </div>
       </header>
 
       <div className="px-4 space-y-6 pb-24">
