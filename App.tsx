@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppScreen, Item, profileToUser } from './types';
+import { AppScreen, Item, profileToUser, AppLocation } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { fetchItems, subscribeToItems } from './services/itemsService';
 import { pushRoute, parseHash, onRouteChange } from './lib/router';
@@ -23,16 +23,51 @@ import PaymentMethodsScreen from './components/PaymentMethodsScreen';
 import AccountSettingsScreen from './components/AccountSettingsScreen';
 import NotificationsScreen from './components/NotificationsScreen';
 import FavoritesScreen from './components/FavoritesScreen';
+import LandingPage from './components/LandingPage';
 
 const AppContent: React.FC = () => {
   const { session, profile, loading } = useAuth();
-  const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.VERIFY);
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.LANDING);
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [selectedDistance, setSelectedDistance] = useState(5);
-  const [userLocation, setUserLocation] = useState('Palo Alto');
+  const [userLocation, setUserLocation] = useState<AppLocation>({ name: 'Palo Alto', lat: 37.4419, lng: -122.1430 });
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+
+  // Request location on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            // Reverse geocode to get city name
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+            const data = await res.json();
+            const cityName = data?.address?.city || data?.address?.town || data?.address?.village || 'Current Location';
+
+            setUserLocation({
+              name: cityName,
+              lat: latitude,
+              lng: longitude
+            });
+          } catch (error) {
+            console.error('Error reverse geocoding:', error);
+            // Fallback to coordinates with generic name if fetch fails
+            setUserLocation({
+              name: 'Current Location',
+              lat: latitude,
+              lng: longitude
+            });
+          }
+        },
+        (error) => {
+          console.log('Location permission denied or error:', error);
+        }
+      );
+    }
+  }, []);
 
   // Hash router: sync URL → screen
   useEffect(() => {
@@ -51,9 +86,13 @@ const AppContent: React.FC = () => {
       const { screen } = parseHash();
       if (screen === AppScreen.LOGIN) {
         setCurrentScreen(AppScreen.LOGIN);
-      } else {
+      } else if (screen === AppScreen.VERIFY) {
         setCurrentScreen(AppScreen.VERIFY);
-        pushRoute(AppScreen.VERIFY);
+      } else {
+        // Default to LANDING for unauth users
+        setCurrentScreen(AppScreen.LANDING);
+        // Don't push route here to keep URL clean, or push it if needed
+        if (screen !== AppScreen.LANDING) pushRoute(AppScreen.LANDING);
       }
     } else if (profile && !profile.name) {
       setCurrentScreen(AppScreen.SETUP_PROFILE);
@@ -61,7 +100,7 @@ const AppContent: React.FC = () => {
     } else if (session) {
       // Check if URL has a valid hash route
       const { screen } = parseHash();
-      if (screen !== AppScreen.VERIFY && screen !== AppScreen.SETUP_PROFILE && screen !== AppScreen.LOGIN) {
+      if (screen !== AppScreen.VERIFY && screen !== AppScreen.SETUP_PROFILE && screen !== AppScreen.LOGIN && screen !== AppScreen.LANDING) {
         setCurrentScreen(screen);
       } else {
         setCurrentScreen(AppScreen.FEED);
@@ -146,6 +185,8 @@ const AppContent: React.FC = () => {
 
   const renderScreen = () => {
     switch (currentScreen) {
+      case AppScreen.LANDING:
+        return <LandingPage onGetStarted={() => { setCurrentScreen(AppScreen.VERIFY); pushRoute(AppScreen.VERIFY); }} onLogin={() => { setCurrentScreen(AppScreen.LOGIN); pushRoute(AppScreen.LOGIN); }} />;
       case AppScreen.VERIFY:
         return <VerifyScreen onVerify={handleVerify} onSkip={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }} onLogin={() => { setCurrentScreen(AppScreen.LOGIN); pushRoute(AppScreen.LOGIN); }} />;
       case AppScreen.LOGIN:
@@ -241,8 +282,10 @@ const AppContent: React.FC = () => {
     }
   };
 
+  const isLanding = currentScreen === AppScreen.LANDING;
+
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-background-light relative flex flex-col shadow-2xl border-x border-slate-200">
+    <div className={isLanding ? "min-h-screen bg-[#0F172A]" : "max-w-md mx-auto min-h-screen bg-background-light relative flex flex-col shadow-2xl border-x border-slate-200"}>
       {renderScreen()}
     </div>
   );

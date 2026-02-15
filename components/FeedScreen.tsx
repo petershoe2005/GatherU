@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppScreen, Item } from '../types';
+import { AppScreen, Item, AppLocation } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchItems } from '../services/itemsService';
 import { subscribeToNotifications, fetchUnreadCount } from '../services/notificationsService';
@@ -12,7 +12,7 @@ interface FeedScreenProps {
   onNavigate: (screen: AppScreen) => void;
   selectedDistance: number;
   onDistanceChange: (distance: number) => void;
-  userLocation: string;
+  userLocation: AppLocation;
   onOpenMap: () => void;
 }
 
@@ -117,7 +117,7 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
             className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-full px-2 py-1 cursor-pointer hover:bg-slate-200 transition-colors"
           >
             <span className="material-icons-round text-primary text-xs">location_on</span>
-            <span className="text-[10px] text-slate-600 font-bold max-w-[80px] truncate">{userLocation}</span>
+            <span className="text-[10px] text-slate-600 font-bold max-w-[80px] truncate">{userLocation.name}</span>
           </div>
         </div>
         <div className="relative cursor-pointer" onClick={() => onNavigate(AppScreen.NOTIFICATIONS)}>

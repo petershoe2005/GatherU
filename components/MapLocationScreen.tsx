@@ -24,10 +24,14 @@ const primaryIcon = new L.Icon({
   className: 'primary-marker',
 });
 
+import { AppLocation } from '../types';
+
+// ... (keep L.Icon code if needed, but I'm just replacing the props interface)
+
 interface MapLocationScreenProps {
-  currentLocation: string;
+  currentLocation: AppLocation;
   onBack: () => void;
-  onSelectLocation: (loc: string) => void;
+  onSelectLocation: (loc: AppLocation) => void;
 }
 
 const CAMPUS_LOCATIONS = [
@@ -58,8 +62,17 @@ function MapClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number
 const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, onBack, onSelectLocation }) => {
   const { updateProfile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLoc, setSelectedLoc] = useState(CAMPUS_LOCATIONS.find(l => l.name === currentLocation) || CAMPUS_LOCATIONS[0]);
-  const [customPin, setCustomPin] = useState<{ lat: number; lng: number; name: string } | null>(null);
+
+  // Initialize with passed location or default
+  const [selectedLoc, setSelectedLoc] = useState<AppLocation>(currentLocation);
+
+  const [customPin, setCustomPin] = useState<{ lat: number; lng: number; name: string } | null>(
+    // If current location is not in predefined list, treat as custom pin
+    !CAMPUS_LOCATIONS.some(l => l.lat === currentLocation.lat && l.lng === currentLocation.lng)
+      ? { ...currentLocation }
+      : null
+  );
+
   const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
   const [detectingLocation, setDetectingLocation] = useState(false);
 
@@ -75,10 +88,10 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
       const data = await res.json();
       const name = data?.address?.suburb || data?.address?.city || data?.address?.town || data?.display_name?.split(',')[0] || 'Custom Location';
       setCustomPin({ lat, lng, name });
-      setSelectedLoc({ name, lat, lng, desc: 'Custom pin' });
+      setSelectedLoc({ name, lat, lng });
     } catch {
       setCustomPin({ lat, lng, name: 'Pinned Location' });
-      setSelectedLoc({ name: 'Pinned Location', lat, lng, desc: 'Custom pin' });
+      setSelectedLoc({ name: 'Pinned Location', lat, lng });
     }
     setIsReverseGeocoding(false);
   };
@@ -99,9 +112,10 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
 
   const handleSetLocation = async () => {
     try {
+      // Save just the name to profile for now, or update profile schema to support lat/lng if needed
       await updateProfile({ location: selectedLoc.name });
     } catch { /* guest mode - no profile */ }
-    onSelectLocation(selectedLoc.name);
+    onSelectLocation(selectedLoc);
   };
 
   return (
@@ -212,7 +226,7 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-secondary truncate">{selectedLoc.name}</h3>
-              <p className="text-xs text-slate-500 truncate">{selectedLoc.desc} • Tap map to pin</p>
+              <p className="text-xs text-slate-500 truncate">Tap map to pin location</p>
             </div>
             <button
               onClick={handleSetLocation}

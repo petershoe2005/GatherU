@@ -1,6 +1,7 @@
 
 export enum AppScreen {
   VERIFY = 'verify',
+  LANDING = 'landing',
   LOGIN = 'login',
   SETUP_PROFILE = 'setup_profile',
   FEED = 'feed',
@@ -202,3 +203,11 @@ export function dbItemToItem(row: any, sellerProfile?: Profile): Item {
     sqft: row.sqft,
   };
 }
+
+export interface AppLocation {
+  name: string;
+  lat: number;
+  lng: number;
+  desc?: string;
+}
+
