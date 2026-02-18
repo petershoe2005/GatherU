@@ -430,5 +430,6 @@ end $$;
 alter publication supabase_realtime add table public.items;
 alter publication supabase_realtime add table public.bids;
 alter publication supabase_realtime add table public.messages;
+alter publication supabase_realtime add table public.conversations;
 alter publication supabase_realtime add table public.notifications;
 alter publication supabase_realtime add table public.favorites;
