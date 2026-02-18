@@ -370,7 +370,29 @@ create policy "Users can unfavorite items"
   on public.favorites for delete using (auth.uid() = user_id);
 
 -- ============================================
--- 9. REPORTS TABLE
+-- 9. REVIEWS TABLE
+-- ============================================
+create table if not exists public.reviews (
+  id uuid default uuid_generate_v4() primary key,
+  reviewer_id uuid references public.profiles(id) on delete cascade not null,
+  seller_id uuid references public.profiles(id) on delete cascade not null,
+  item_id uuid references public.items(id) on delete cascade not null,
+  rating int not null check (rating >= 1 and rating <= 5),
+  comment text default '',
+  created_at timestamptz default now(),
+  unique(reviewer_id, item_id)
+);
+
+alter table public.reviews enable row level security;
+
+create policy "Reviews are viewable by everyone"
+  on public.reviews for select using (true);
+
+create policy "Authenticated users can submit reviews"
+  on public.reviews for insert with check (auth.uid() = reviewer_id);
+
+-- ============================================
+-- 10. REPORTS TABLE
 -- ============================================
 create table if not exists public.reports (
   id uuid default uuid_generate_v4() primary key,
@@ -430,5 +452,6 @@ end $$;
 alter publication supabase_realtime add table public.items;
 alter publication supabase_realtime add table public.bids;
 alter publication supabase_realtime add table public.messages;
+alter publication supabase_realtime add table public.conversations;
 alter publication supabase_realtime add table public.notifications;
 alter publication supabase_realtime add table public.favorites;

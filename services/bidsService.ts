@@ -21,6 +21,9 @@ export const placeBid = async (
 };
 
 export const fetchBidsForItem = async (itemId: string): Promise<Bid[]> => {
+    // Demo items have non-UUID IDs — skip DB query
+    if (itemId.startsWith('demo-')) return [];
+
     const { data, error } = await supabase
         .from('bids')
         .select('*, profiles(*)')

@@ -103,6 +103,7 @@ export const deleteItem = async (id: string): Promise<boolean> => {
 };
 
 export const incrementViewCount = async (id: string): Promise<void> => {
+    if (id.startsWith('demo-')) return;
     // Fetch current count and increment
     const { data } = await supabase
         .from('items')

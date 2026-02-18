@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AppScreen, Item, dbItemToItem } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { fetchFavoriteItems, removeFavorite } from '../services/favoritesService';
 import BottomNav from './BottomNav';
 

@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { AppScreen, Item, profileToUser, AppLocation } from './types';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/useAuth';
 import { fetchItems, subscribeToItems } from './services/itemsService';
+import { createConversation } from './services/messagesService';
 import { pushRoute, parseHash, onRouteChange } from './lib/router';
 import VerifyScreen from './components/VerifyScreen';
 import LoginScreen from './components/LoginScreen';
@@ -24,6 +26,7 @@ import AccountSettingsScreen from './components/AccountSettingsScreen';
 import NotificationsScreen from './components/NotificationsScreen';
 import FavoritesScreen from './components/FavoritesScreen';
 import LandingPage from './components/LandingPage';
+import CheckoutScreen from './components/CheckoutScreen';
 
 const AppContent: React.FC = () => {
   const { session, profile, loading } = useAuth();
@@ -34,6 +37,7 @@ const AppContent: React.FC = () => {
   const [selectedDistance, setSelectedDistance] = useState(5);
   const [userLocation, setUserLocation] = useState<AppLocation>({ name: 'Palo Alto', lat: 37.4419, lng: -122.1430 });
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [checkoutItem, setCheckoutItem] = useState<Item | null>(null);
 
   // Request location on mount
   useEffect(() => {
@@ -100,7 +104,7 @@ const AppContent: React.FC = () => {
     } else if (session) {
       // Check if URL has a valid hash route
       const { screen } = parseHash();
-      if (screen !== AppScreen.VERIFY && screen !== AppScreen.SETUP_PROFILE && screen !== AppScreen.LOGIN && screen !== AppScreen.LANDING) {
+        if (screen !== AppScreen.VERIFY && screen !== AppScreen.SETUP_PROFILE && screen !== AppScreen.LOGIN && screen !== AppScreen.LANDING && screen !== AppScreen.CHECKOUT) {
         setCurrentScreen(screen);
       } else {
         setCurrentScreen(AppScreen.FEED);
@@ -170,6 +174,24 @@ const AppContent: React.FC = () => {
     }
   };
 
+  const handleMessageSeller = useCallback(async () => {
+    if (!selectedItem || !profile) return;
+    const sellerId = selectedItem.seller_id;
+    if (!sellerId || sellerId === profile.id) return;
+    // Demo items use fake non-UUID seller IDs — can't create a real conversation
+    if (sellerId.startsWith('demo-')) {
+      alert('Chat is only available for real listings. Create a listing to start chatting!');
+      return;
+    }
+    const isDemo = selectedItem.id.startsWith('demo-');
+    const conv = await createConversation(isDemo ? null : selectedItem.id, profile.id, sellerId);
+    if (conv) {
+      setSelectedConversationId(conv.id);
+      setCurrentScreen(AppScreen.CHAT_DETAIL);
+      pushRoute(AppScreen.CHAT_DETAIL, { convId: conv.id });
+    }
+  }, [selectedItem, profile]);
+
   const currentUser = profile ? profileToUser(profile) : null;
 
   if (loading) {
@@ -222,14 +244,16 @@ const AppContent: React.FC = () => {
         );
       case AppScreen.DETAILS:
         return selectedItem ? (
-          <DetailsScreen
-            item={selectedItem}
-            onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
-            onConfirmDelivery={() => navigate(AppScreen.DELIVERY, selectedItem)}
-            onViewLive={() => navigate(AppScreen.LIVE_STATUS, selectedItem)}
-            onEndBidding={() => handleEndBidding(selectedItem.id)}
-          />
-        ) : null;
+              <DetailsScreen
+                item={selectedItem}
+                onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
+                onConfirmDelivery={() => navigate(AppScreen.DELIVERY, selectedItem)}
+                onViewLive={() => navigate(AppScreen.LIVE_STATUS, selectedItem)}
+                onEndBidding={() => handleEndBidding(selectedItem.id)}
+                onBuyNow={() => { setCheckoutItem(selectedItem); setCurrentScreen(AppScreen.CHECKOUT); pushRoute(AppScreen.CHECKOUT); }}
+                onMessageSeller={handleMessageSeller}
+              />
+          ) : null;
       case AppScreen.CREATE:
         return <CreateListingScreen onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }} onPublish={handlePublishListing} />;
       case AppScreen.BIDS:
@@ -276,8 +300,16 @@ const AppContent: React.FC = () => {
       case AppScreen.FAVORITES:
         return <FavoritesScreen onBack={() => navigate(AppScreen.PROFILE)} onNavigate={(screen: AppScreen, item?: Item | null) => { if (item) setSelectedItem(item); setCurrentScreen(screen); pushRoute(screen, item ? { id: item.id } : {}); }} />;
       case AppScreen.CHAT_DETAIL:
-        return <ChatDetailScreen conversationId={selectedConversationId} onBack={() => { setCurrentScreen(AppScreen.MESSAGES); pushRoute(AppScreen.MESSAGES); }} />;
-      default:
+          return <ChatDetailScreen conversationId={selectedConversationId} onBack={() => { setCurrentScreen(AppScreen.MESSAGES); pushRoute(AppScreen.MESSAGES); }} />;
+      case AppScreen.CHECKOUT:
+          return checkoutItem ? (
+            <CheckoutScreen
+              item={checkoutItem}
+              onBack={() => { setCurrentScreen(AppScreen.DETAILS); pushRoute(AppScreen.DETAILS, { id: checkoutItem.id }); }}
+              onSuccess={() => { setCheckoutItem(null); setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
+            />
+          ) : null;
+        default:
         return <FeedScreen items={items} onSelectItem={(item) => navigate(AppScreen.DETAILS, item)} onNavigate={navigate} selectedDistance={selectedDistance} onDistanceChange={setSelectedDistance} userLocation={userLocation} onOpenMap={() => navigate(AppScreen.MAP_LOCATION)} />;
     }
   };

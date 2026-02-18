@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AppScreen, Conversation, AppNotification } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { fetchConversations } from '../services/messagesService';
 import { fetchNotifications, markNotificationRead, deleteNotification } from '../services/notificationsService';
 import BottomNav from './BottomNav';

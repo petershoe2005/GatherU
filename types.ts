@@ -19,7 +19,8 @@ export enum AppScreen {
   PAYMENT_METHODS = 'payment_methods',
   ACCOUNT_SETTINGS = 'account_settings',
   NOTIFICATIONS = 'notifications',
-  FAVORITES = 'favorites'
+  FAVORITES = 'favorites',
+  CHECKOUT = 'checkout'
 }
 
 

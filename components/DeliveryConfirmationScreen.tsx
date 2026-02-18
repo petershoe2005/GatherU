@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Item } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { confirmDelivery, submitReview, createOrder } from '../services/ordersService';
 
 interface DeliveryConfirmationScreenProps {

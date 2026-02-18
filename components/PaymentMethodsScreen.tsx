@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { updateSettings } from '../services/profileService';
 
 interface PaymentMethodsScreenProps {

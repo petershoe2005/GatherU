@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage, Conversation } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { fetchMessages, sendMessage, subscribeToMessages, fetchConversationById } from '../services/messagesService';
 
 interface ChatDetailScreenProps {

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { getSmartDescription } from '../services/geminiService';
 import { Item } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { createItem } from '../services/itemsService';
 import ImageUploader from './ImageUploader';
 

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Item, AppScreen, dbItemToItem } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { fetchUserBids } from '../services/bidsService';
 import BottomNav from './BottomNav';
 

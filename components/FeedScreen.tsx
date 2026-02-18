@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AppScreen, Item, AppLocation } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { fetchItems } from '../services/itemsService';
 import { subscribeToNotifications, fetchUnreadCount } from '../services/notificationsService';
 import { addFavorite, removeFavorite, isFavorited } from '../services/favoritesService';
