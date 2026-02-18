@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AppScreen } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { fetchProfileStats } from '../services/profileService';
 import BottomNav from './BottomNav';
 

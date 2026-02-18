@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Item, Bid } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { placeBid } from '../services/bidsService';
 import { fetchBidsForItem, subscribeToBids } from '../services/bidsService';
 import { incrementViewCount } from '../services/itemsService';

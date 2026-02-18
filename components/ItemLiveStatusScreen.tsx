@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { Item, Bid } from '../types';
 import { fetchBidsForItem, subscribeToBids } from '../services/bidsService';
 import PriceChart from './PriceChart';

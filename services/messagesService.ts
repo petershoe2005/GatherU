@@ -91,24 +91,29 @@ export const sendMessage = async (
 };
 
 export const createConversation = async (
-    itemId: string,
+    itemId: string | null,
     buyerId: string,
     sellerId: string
 ): Promise<Conversation | null> => {
-    // Check if conversation already exists
-    const { data: existing } = await supabase
+    // Check if conversation already exists between these two users (with or without item)
+    let existingQuery = supabase
         .from('conversations')
         .select('*')
-        .eq('item_id', itemId)
         .eq('buyer_id', buyerId)
-        .eq('seller_id', sellerId)
-        .single();
+        .eq('seller_id', sellerId);
 
+    if (itemId) existingQuery = existingQuery.eq('item_id', itemId);
+    else existingQuery = existingQuery.is('item_id', null);
+
+    const { data: existing } = await existingQuery.maybeSingle();
     if (existing) return existing as Conversation;
+
+    const insertPayload: any = { buyer_id: buyerId, seller_id: sellerId };
+    if (itemId) insertPayload.item_id = itemId;
 
     const { data, error } = await supabase
         .from('conversations')
-        .insert({ item_id: itemId, buyer_id: buyerId, seller_id: sellerId })
+        .insert(insertPayload)
         .select('*')
         .single();
 

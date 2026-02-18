@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Item } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { createOrder } from '../services/ordersService';
 import { stripePromise, createPaymentIntent } from '../services/stripeService';
 

@@ -46,7 +46,7 @@ export const submitReview = async (review: {
 };
 
 export const fetchReviewsForSeller = async (sellerId: string): Promise<Review[]> => {
-    if (!isSupabaseConfigured) return [];
+    if (!isSupabaseConfigured || sellerId.startsWith('demo-')) return [];
 
     const { data, error } = await supabase
         .from('reviews')

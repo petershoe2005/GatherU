@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { AppScreen, Item, profileToUser, AppLocation } from './types';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/useAuth';
 import { fetchItems, subscribeToItems } from './services/itemsService';
 import { createConversation } from './services/messagesService';
 import { pushRoute, parseHash, onRouteChange } from './lib/router';
@@ -177,7 +178,13 @@ const AppContent: React.FC = () => {
     if (!selectedItem || !profile) return;
     const sellerId = selectedItem.seller_id;
     if (!sellerId || sellerId === profile.id) return;
-    const conv = await createConversation(selectedItem.id, profile.id, sellerId);
+    // Demo items use fake non-UUID seller IDs — can't create a real conversation
+    if (sellerId.startsWith('demo-')) {
+      alert('Chat is only available for real listings. Create a listing to start chatting!');
+      return;
+    }
+    const isDemo = selectedItem.id.startsWith('demo-');
+    const conv = await createConversation(isDemo ? null : selectedItem.id, profile.id, sellerId);
     if (conv) {
       setSelectedConversationId(conv.id);
       setCurrentScreen(AppScreen.CHAT_DETAIL);

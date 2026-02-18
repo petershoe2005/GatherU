@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AppScreen, AppNotification } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { isSupabaseConfigured } from '../lib/supabase';
 import {
     fetchNotifications,
