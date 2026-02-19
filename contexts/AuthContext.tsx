@@ -16,11 +16,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             .eq('id', userId)
             .maybeSingle();
 
+        // Helper: build initial profile data from auth user
+        const buildInitialProfile = async () => {
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            const email = authUser?.email || '';
+            const emailPrefix = email.split('@')[0] || '';
+            // Derive a readable name from the email prefix (e.g. "lxu" → "Lxu", "peter.xu" → "Peter Xu")
+            const derivedName = emailPrefix
+                .split(/[._-]/)
+                .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+                .join(' ');
+            const isEdu = email.toLowerCase().endsWith('.edu');
+
+            return {
+                id: userId,
+                email,
+                name: derivedName,
+                username: emailPrefix,
+                is_verified: isEdu,
+                institution: isEdu ? (email.split('@')[1]?.replace('.edu', '').toUpperCase() || '') : '',
+            };
+        };
+
         if (!data && !error) {
-            // Profile doesn't exist yet — create it
+            // Profile doesn't exist yet — create it with user info
+            const initialData = await buildInitialProfile();
             const { data: newProfile } = await supabase
                 .from('profiles')
-                .upsert({ id: userId }, { onConflict: 'id' })
+                .upsert(initialData, { onConflict: 'id' })
                 .select('*')
                 .maybeSingle();
             if (newProfile) setProfile(newProfile as Profile);
@@ -28,9 +51,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
 
         if (error && (error.code === 'PGRST116' || error.code === '406')) {
+            const initialData = await buildInitialProfile();
             const { data: newProfile } = await supabase
                 .from('profiles')
-                .upsert({ id: userId }, { onConflict: 'id' })
+                .upsert(initialData, { onConflict: 'id' })
                 .select('*')
                 .maybeSingle();
             if (newProfile) setProfile(newProfile as Profile);
@@ -38,7 +62,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
 
         if (!error && data) {
-            setProfile(data as Profile);
+            let profileData = data as Profile;
+            // If existing profile has empty name, populate from email
+            if (!profileData.name || profileData.name === '') {
+                const initialData = await buildInitialProfile();
+                const { data: updated } = await supabase
+                    .from('profiles')
+                    .update({ name: initialData.name, username: initialData.username, email: initialData.email, is_verified: initialData.is_verified, institution: initialData.institution || profileData.institution })
+                    .eq('id', userId)
+                    .select('*')
+                    .maybeSingle();
+                if (updated) profileData = updated as Profile;
+            }
+            setProfile(profileData);
         }
         return data as Profile | null;
     };
