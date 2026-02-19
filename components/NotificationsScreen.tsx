@@ -40,8 +40,8 @@ const DEMO_NOTIFICATIONS: AppNotification[] = [
 
 const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack, onNavigate }) => {
     const { user } = useAuth();
-    const [notifications, setNotifications] = useState<AppNotification[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [notifications, setNotifications] = useState<AppNotification[]>(DEMO_NOTIFICATIONS);
+    const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
     useEffect(() => {
@@ -60,14 +60,16 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack, onNav
     }, [user]);
 
     const loadNotifications = async () => {
-        setLoading(true);
-        if (user && isSupabaseConfigured) {
+        if (!user || !isSupabaseConfigured) return;
+        // Don't show spinner — we already have demo data displayed
+        try {
             const data = await fetchNotifications(user.id);
-            setNotifications(data.length > 0 ? data : DEMO_NOTIFICATIONS);
-        } else {
-            setNotifications(DEMO_NOTIFICATIONS);
+            if (data.length > 0) {
+                setNotifications(data);
+            }
+        } catch (err) {
+            console.error('Error loading notifications:', err);
         }
-        setLoading(false);
     };
 
     const handleMarkAsRead = async (id: string) => {
