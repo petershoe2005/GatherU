@@ -17,10 +17,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onBack }) => 
         e.preventDefault();
         if (!email || !password) return;
 
-        if (!email.endsWith('.edu')) {
-            setErrorMsg('Please use your university .edu email.');
-            return;
-        }
 
         setIsSubmitting(true);
         setErrorMsg('');
@@ -62,7 +58,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onBack }) => 
             <form onSubmit={handleSubmit} className="w-full space-y-5 relative z-10 max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="space-y-1.5">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">
-                        University Email
+                        Email Address
                     </label>
                     <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-primary transition-colors">
@@ -73,7 +69,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onBack }) => 
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="block w-full pl-11 pr-4 py-4 bg-slate-900/50 border border-white/5 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-600 font-medium"
-                            placeholder="name@university.edu"
+                            placeholder="name@email.com"
                             type="email"
                         />
                     </div>

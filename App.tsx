@@ -233,7 +233,7 @@ const AppContent: React.FC = () => {
       case AppScreen.LANDING:
         return <LandingPage onGetStarted={() => { setCurrentScreen(AppScreen.VERIFY); pushRoute(AppScreen.VERIFY); }} onLogin={() => { setCurrentScreen(AppScreen.LOGIN); pushRoute(AppScreen.LOGIN); }} />;
       case AppScreen.VERIFY:
-        return <VerifyScreen onVerify={handleVerify} onSkip={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }} onLogin={() => { setCurrentScreen(AppScreen.LOGIN); pushRoute(AppScreen.LOGIN); }} />;
+        return <VerifyScreen onVerify={handleVerify} onLogin={() => { setCurrentScreen(AppScreen.LOGIN); pushRoute(AppScreen.LOGIN); }} />;
       case AppScreen.LOGIN:
         return <LoginScreen onLoginSuccess={handleProfileComplete} onBack={() => { setCurrentScreen(AppScreen.VERIFY); pushRoute(AppScreen.VERIFY); }} />;
       case AppScreen.SETUP_PROFILE:
