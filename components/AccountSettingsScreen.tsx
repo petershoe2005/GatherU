@@ -33,6 +33,7 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
   // Bio state
   const [bio, setBio] = useState(profile?.bio || '');
   const [savingBio, setSavingBio] = useState(false);
+  const [editingBio, setEditingBio] = useState(false);
 
   // Avatar upload state
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -227,24 +228,59 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
                     <p className="text-xs text-slate-400">Introduce yourself</p>
                   </div>
                 </div>
-                {savingBio && <span className="text-[10px] text-primary font-medium">Saving...</span>}
+                {!editingBio ? (
+                  <button
+                    onClick={() => setEditingBio(true)}
+                    className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-lg hover:bg-primary/20 transition-colors"
+                  >
+                    Edit
+                  </button>
+                ) : savingBio ? (
+                  <span className="text-[10px] text-primary font-medium">Saving...</span>
+                ) : null}
               </div>
-              <textarea
-                className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-primary/50 transition-colors resize-none mt-1"
-                rows={2}
-                maxLength={100}
-                placeholder="Write a short bio..."
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                onBlur={async () => {
-                  if (!profile || bio === (profile.bio || '')) return;
-                  setSavingBio(true);
-                  await updateProfile(profile.id, { bio });
-                  await refreshProfile();
-                  setSavingBio(false);
-                }}
-              />
-              <p className={`text-right text-[10px] mt-1 ${bio.length >= 90 ? 'text-amber-400' : 'text-slate-500'}`}>{bio.length}/100</p>
+
+              {editingBio ? (
+                <>
+                  <textarea
+                    className="w-full bg-background-dark border border-primary/30 rounded-xl px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-primary/50 transition-colors resize-none mt-1"
+                    rows={2}
+                    maxLength={100}
+                    placeholder="Write a short bio..."
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    autoFocus
+                  />
+                  <div className="flex items-center justify-between mt-2">
+                    <p className={`text-[10px] ${bio.length >= 90 ? 'text-amber-400' : 'text-slate-500'}`}>{bio.length}/100</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => { setBio(profile?.bio || ''); setEditingBio(false); }}
+                        className="text-xs font-semibold text-slate-400 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (!profile) return;
+                          setSavingBio(true);
+                          await updateProfile(profile.id, { bio });
+                          await refreshProfile();
+                          setSavingBio(false);
+                          setEditingBio(false);
+                        }}
+                        className="text-xs font-semibold text-white bg-primary px-4 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-slate-400 mt-1 min-h-[20px]">
+                  {bio || <span className="italic text-slate-600">No bio yet — tap Edit to add one</span>}
+                </p>
+              )}
             </div>
           </div>
         </section>
