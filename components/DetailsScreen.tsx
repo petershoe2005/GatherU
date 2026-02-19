@@ -11,16 +11,17 @@ import ReviewModal from './ReviewModal';
 import { useCountdown } from '../lib/useCountdown';
 
 interface DetailsScreenProps {
-    item: Item;
-    onBack: () => void;
-    onConfirmDelivery: () => void;
-    onViewLive: () => void;
-    onEndBidding: () => void;
-    onBuyNow?: () => void;
-    onMessageSeller?: () => void;
+  item: Item;
+  onBack: () => void;
+  onConfirmDelivery: () => void;
+  onViewLive: () => void;
+  onEndBidding: () => void;
+  onBuyNow?: () => void;
+  onMessageSeller?: () => void;
+  onViewSellerProfile?: () => void;
 }
 
-const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDelivery, onViewLive, onEndBidding, onBuyNow, onMessageSeller }) => {
+const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDelivery, onViewLive, onEndBidding, onBuyNow, onMessageSeller, onViewSellerProfile }) => {
   const { user } = useAuth();
   const [currentBid, setCurrentBid] = useState(item.currentBid);
   const [isBidding, setIsBidding] = useState(false);
@@ -287,7 +288,10 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
           </div>
 
           {/* Seller Info */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center gap-4">
+          <div
+            className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-100 transition-colors"
+            onClick={onViewSellerProfile}
+          >
             <div className="relative w-12 h-12 shrink-0">
               <img className="w-12 h-12 rounded-full object-cover border-2 border-primary/30" src={item.seller.avatar || 'https://picsum.photos/seed/default/100/100'} alt={item.seller.name} />
               {item.seller.isVerified && (
@@ -304,9 +308,9 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
                 <span className="text-[10px] text-slate-400">({item.seller.reviewsCount} reviews)</span>
               </div>
             </div>
-              <button className="bg-primary/10 text-primary p-2.5 rounded-xl hover:bg-primary/20 transition-colors" onClick={onMessageSeller}>
-                <span className="material-icons-round text-lg">chat</span>
-              </button>
+            <button className="bg-primary/10 text-primary p-2.5 rounded-xl hover:bg-primary/20 transition-colors" onClick={(e) => { e.stopPropagation(); onMessageSeller?.(); }}>
+              <span className="material-icons-round text-lg">chat</span>
+            </button>
           </div>
 
           {/* Recent Bids */}
@@ -391,9 +395,9 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
         ) : isHousing ? (
           /* Housing Contact Button */
           <button
-              onClick={onMessageSeller}
-              className="w-full bg-primary hover:bg-primary/90 text-slate-900 font-black py-4 rounded-xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-            >
+            onClick={onMessageSeller}
+            className="w-full bg-primary hover:bg-primary/90 text-slate-900 font-black py-4 rounded-xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          >
             <span className="material-icons-round text-sm">chat</span>
             Message Landlord
           </button>
@@ -416,15 +420,15 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
               </button>
             )}
           </div>
-          ) : item.listing_type === 'fixed' ? (
-            /* Fixed price only — Buy Now button */
-            <button
-              onClick={onBuyNow}
-              className="w-full bg-primary hover:bg-primary/90 text-slate-900 font-black py-4 rounded-xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              <span className="material-icons-round text-sm">flash_on</span>
-              Buy Now — ${item.buyNowPrice?.toFixed(2)}
-            </button>
+        ) : item.listing_type === 'fixed' ? (
+          /* Fixed price only — Buy Now button */
+          <button
+            onClick={onBuyNow}
+            className="w-full bg-primary hover:bg-primary/90 text-slate-900 font-black py-4 rounded-xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            <span className="material-icons-round text-sm">flash_on</span>
+            Buy Now — ${item.buyNowPrice?.toFixed(2)}
+          </button>
         ) : (
           <div className="space-y-2">
             {/* Auction bidding */}
@@ -458,8 +462,8 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
               </button>
             </div>
             {/* Buy Now option for "both" type */}
-              {item.listing_type === 'both' && item.buyNowPrice && (
-                <button onClick={onBuyNow} className="w-full bg-blue-500/10 text-blue-400 font-bold py-3 rounded-xl border border-blue-500/20 flex items-center justify-center gap-2 hover:bg-blue-500/20 transition-colors">
+            {item.listing_type === 'both' && item.buyNowPrice && (
+              <button onClick={onBuyNow} className="w-full bg-blue-500/10 text-blue-400 font-bold py-3 rounded-xl border border-blue-500/20 flex items-center justify-center gap-2 hover:bg-blue-500/20 transition-colors">
                 <span className="material-icons-round text-sm">flash_on</span>
                 Buy Now — ${item.buyNowPrice.toFixed(2)}
               </button>

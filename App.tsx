@@ -27,6 +27,7 @@ import NotificationsScreen from './components/NotificationsScreen';
 import FavoritesScreen from './components/FavoritesScreen';
 import LandingPage from './components/LandingPage';
 import CheckoutScreen from './components/CheckoutScreen';
+import UserProfileScreen from './components/UserProfileScreen';
 
 const AppContent: React.FC = () => {
   const { session, profile, loading } = useAuth();
@@ -38,6 +39,7 @@ const AppContent: React.FC = () => {
   const [userLocation, setUserLocation] = useState<AppLocation>({ name: 'Palo Alto', lat: 37.4419, lng: -122.1430 });
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [checkoutItem, setCheckoutItem] = useState<Item | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Request location on mount
   useEffect(() => {
@@ -273,6 +275,7 @@ const AppContent: React.FC = () => {
             onEndBidding={() => handleEndBidding(selectedItem.id)}
             onBuyNow={() => { setCheckoutItem(selectedItem); setCurrentScreen(AppScreen.CHECKOUT); pushRoute(AppScreen.CHECKOUT); }}
             onMessageSeller={handleMessageSeller}
+            onViewSellerProfile={() => { setSelectedUserId(selectedItem.seller_id); setCurrentScreen(AppScreen.USER_PROFILE); pushRoute(AppScreen.USER_PROFILE); }}
           />
         ) : null;
       case AppScreen.CREATE:
@@ -328,6 +331,16 @@ const AppContent: React.FC = () => {
             item={checkoutItem}
             onBack={() => { setCurrentScreen(AppScreen.DETAILS); pushRoute(AppScreen.DETAILS, { id: checkoutItem.id }); }}
             onSuccess={() => { setCheckoutItem(null); setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
+          />
+        ) : null;
+      case AppScreen.USER_PROFILE:
+        return selectedUserId ? (
+          <UserProfileScreen
+            userId={selectedUserId}
+            onBack={() => { setCurrentScreen(AppScreen.DETAILS); if (selectedItem) pushRoute(AppScreen.DETAILS, { id: selectedItem.id }); }}
+            onMessage={() => {
+              if (selectedItem) handleMessageSeller();
+            }}
           />
         ) : null;
       default:

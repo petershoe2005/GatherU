@@ -20,7 +20,8 @@ export enum AppScreen {
   ACCOUNT_SETTINGS = 'account_settings',
   NOTIFICATIONS = 'notifications',
   FAVORITES = 'favorites',
-  CHECKOUT = 'checkout'
+  CHECKOUT = 'checkout',
+  USER_PROFILE = 'user_profile'
 }
 
 
@@ -51,6 +52,7 @@ export interface Profile {
   message_alerts: boolean;
   created_at: string;
   updated_at: string;
+  bio?: string;
 }
 
 export interface Item {

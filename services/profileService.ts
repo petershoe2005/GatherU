@@ -82,3 +82,20 @@ export const fetchProfileStats = async (
         rating: profileData?.rating || 0,
     };
 };
+
+/**
+ * Fetch a user's public profile with stats (items sold, items bought)
+ */
+export const fetchPublicProfile = async (userId: string) => {
+    const [profileData, soldResult, boughtResult] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+        supabase.from('items').select('*', { count: 'exact', head: true }).eq('seller_id', userId).eq('status', 'sold'),
+        supabase.from('items').select('*', { count: 'exact', head: true }).eq('buyer_id', userId),
+    ]);
+
+    return {
+        profile: profileData.data as Profile | null,
+        itemsSold: soldResult.count || 0,
+        itemsBought: boughtResult.count || 0,
+    };
+};

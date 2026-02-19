@@ -30,6 +30,10 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
   const [newName, setNewName] = useState(profile?.name || '');
   const [savingName, setSavingName] = useState(false);
 
+  // Bio state
+  const [bio, setBio] = useState(profile?.bio || '');
+  const [savingBio, setSavingBio] = useState(false);
+
   // Avatar upload state
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileInputFilesRef = useRef<HTMLInputElement>(null);
@@ -42,6 +46,7 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
       setGpsRadius(profile.gps_radius || 5);
       setBiddingAlerts(profile.bidding_alerts ?? true);
       setMsgAlerts(profile.message_alerts ?? true);
+      setBio(profile.bio || '');
     }
   }, [profile]);
 
@@ -206,6 +211,40 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
                 <p className="text-xs text-slate-400">EDU Email Address</p>
               </div>
               <span className="material-icons-round text-slate-600 text-xl">lock</span>
+            </div>
+          </div>
+
+          {/* About Me / Bio */}
+          <div className="mt-3 bg-surface-dark border border-border-dark overflow-hidden rounded-2xl">
+            <div className="px-4 py-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                    <span className="material-icons-round">edit_note</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-base">About Me</p>
+                    <p className="text-xs text-slate-400">Introduce yourself</p>
+                  </div>
+                </div>
+                {savingBio && <span className="text-[10px] text-primary font-medium">Saving...</span>}
+              </div>
+              <textarea
+                className="w-full bg-background-dark border border-border-dark rounded-xl px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-primary/50 transition-colors resize-none mt-1"
+                rows={2}
+                maxLength={100}
+                placeholder="Write a short bio..."
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                onBlur={async () => {
+                  if (!profile || bio === (profile.bio || '')) return;
+                  setSavingBio(true);
+                  await updateProfile(profile.id, { bio });
+                  await refreshProfile();
+                  setSavingBio(false);
+                }}
+              />
+              <p className={`text-right text-[10px] mt-1 ${bio.length >= 90 ? 'text-amber-400' : 'text-slate-500'}`}>{bio.length}/100</p>
             </div>
           </div>
         </section>
