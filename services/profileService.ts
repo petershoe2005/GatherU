@@ -87,15 +87,25 @@ export const fetchProfileStats = async (
  * Fetch a user's public profile with stats (items sold, items bought)
  */
 export const fetchPublicProfile = async (userId: string) => {
-    const [profileData, soldResult, boughtResult] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
-        supabase.from('items').select('*', { count: 'exact', head: true }).eq('seller_id', userId).eq('status', 'sold'),
-        supabase.from('items').select('*', { count: 'exact', head: true }).eq('buyer_id', userId),
-    ]);
+    // Guard: demo IDs have no real profiles
+    if (userId.startsWith('demo-')) {
+        return { profile: null, itemsSold: 0, itemsBought: 0 };
+    }
 
-    return {
-        profile: profileData.data as Profile | null,
-        itemsSold: soldResult.count || 0,
-        itemsBought: boughtResult.count || 0,
-    };
+    try {
+        const [profileResult, soldResult, boughtResult] = await Promise.allSettled([
+            supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+            supabase.from('items').select('*', { count: 'exact', head: true }).eq('seller_id', userId).eq('status', 'sold'),
+            supabase.from('orders').select('*', { count: 'exact', head: true }).eq('buyer_id', userId),
+        ]);
+
+        const profile = profileResult.status === 'fulfilled' ? (profileResult.value.data as Profile | null) : null;
+        const itemsSold = soldResult.status === 'fulfilled' ? (soldResult.value.count || 0) : 0;
+        const itemsBought = boughtResult.status === 'fulfilled' ? (boughtResult.value.count || 0) : 0;
+
+        return { profile, itemsSold, itemsBought };
+    } catch (err) {
+        console.error('fetchPublicProfile error:', err);
+        return { profile: null, itemsSold: 0, itemsBought: 0 };
+    }
 };
