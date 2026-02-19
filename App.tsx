@@ -47,11 +47,11 @@ const AppContent: React.FC = () => {
           const { latitude, longitude } = position.coords;
           try {
             // Reverse geocode to get city name
-              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
-              if (!res.ok) throw new Error('Geocode failed');
-              const text = await res.text();
-              if (!text) throw new Error('Empty response');
-              const data = JSON.parse(text);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+            if (!res.ok) throw new Error('Geocode failed');
+            const text = await res.text();
+            if (!text) throw new Error('Empty response');
+            const data = JSON.parse(text);
             const cityName = data?.address?.city || data?.address?.town || data?.address?.village || 'Current Location';
 
             setUserLocation({
@@ -107,7 +107,7 @@ const AppContent: React.FC = () => {
     } else if (session) {
       // Check if URL has a valid hash route
       const { screen } = parseHash();
-        if (screen !== AppScreen.VERIFY && screen !== AppScreen.SETUP_PROFILE && screen !== AppScreen.LOGIN && screen !== AppScreen.LANDING && screen !== AppScreen.CHECKOUT) {
+      if (screen !== AppScreen.VERIFY && screen !== AppScreen.SETUP_PROFILE && screen !== AppScreen.LOGIN && screen !== AppScreen.LANDING && screen !== AppScreen.CHECKOUT) {
         setCurrentScreen(screen);
       } else {
         setCurrentScreen(AppScreen.FEED);
@@ -178,20 +178,38 @@ const AppContent: React.FC = () => {
   };
 
   const handleMessageSeller = useCallback(async () => {
-    if (!selectedItem || !profile) return;
+    if (!selectedItem) return;
+
+    if (!profile) {
+      alert("Please log in to start a chat.");
+      setCurrentScreen(AppScreen.LOGIN);
+      pushRoute(AppScreen.LOGIN);
+      return;
+    }
+
     const sellerId = selectedItem.seller_id;
-    if (!sellerId || sellerId === profile.id) return;
+    if (!sellerId) return;
+
+    if (sellerId === profile.id) {
+      alert("You cannot chat with your own listing.");
+      return;
+    }
+
     // Demo items use fake non-UUID seller IDs — can't create a real conversation
     if (sellerId.startsWith('demo-')) {
       alert('Chat is only available for real listings. Create a listing to start chatting!');
       return;
     }
+
     const isDemo = selectedItem.id.startsWith('demo-');
     const conv = await createConversation(isDemo ? null : selectedItem.id, profile.id, sellerId);
+
     if (conv) {
       setSelectedConversationId(conv.id);
       setCurrentScreen(AppScreen.CHAT_DETAIL);
       pushRoute(AppScreen.CHAT_DETAIL, { convId: conv.id });
+    } else {
+      alert("Failed to create conversation. Please try again.");
     }
   }, [selectedItem, profile]);
 
@@ -247,16 +265,16 @@ const AppContent: React.FC = () => {
         );
       case AppScreen.DETAILS:
         return selectedItem ? (
-              <DetailsScreen
-                item={selectedItem}
-                onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
-                onConfirmDelivery={() => navigate(AppScreen.DELIVERY, selectedItem)}
-                onViewLive={() => navigate(AppScreen.LIVE_STATUS, selectedItem)}
-                onEndBidding={() => handleEndBidding(selectedItem.id)}
-                onBuyNow={() => { setCheckoutItem(selectedItem); setCurrentScreen(AppScreen.CHECKOUT); pushRoute(AppScreen.CHECKOUT); }}
-                onMessageSeller={handleMessageSeller}
-              />
-          ) : null;
+          <DetailsScreen
+            item={selectedItem}
+            onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
+            onConfirmDelivery={() => navigate(AppScreen.DELIVERY, selectedItem)}
+            onViewLive={() => navigate(AppScreen.LIVE_STATUS, selectedItem)}
+            onEndBidding={() => handleEndBidding(selectedItem.id)}
+            onBuyNow={() => { setCheckoutItem(selectedItem); setCurrentScreen(AppScreen.CHECKOUT); pushRoute(AppScreen.CHECKOUT); }}
+            onMessageSeller={handleMessageSeller}
+          />
+        ) : null;
       case AppScreen.CREATE:
         return <CreateListingScreen onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }} onPublish={handlePublishListing} />;
       case AppScreen.BIDS:
@@ -303,16 +321,16 @@ const AppContent: React.FC = () => {
       case AppScreen.FAVORITES:
         return <FavoritesScreen onBack={() => navigate(AppScreen.PROFILE)} onNavigate={(screen: AppScreen, item?: Item | null) => { if (item) setSelectedItem(item); setCurrentScreen(screen); pushRoute(screen, item ? { id: item.id } : {}); }} />;
       case AppScreen.CHAT_DETAIL:
-          return <ChatDetailScreen conversationId={selectedConversationId} onBack={() => { setCurrentScreen(AppScreen.MESSAGES); pushRoute(AppScreen.MESSAGES); }} />;
+        return <ChatDetailScreen conversationId={selectedConversationId} onBack={() => { setCurrentScreen(AppScreen.MESSAGES); pushRoute(AppScreen.MESSAGES); }} />;
       case AppScreen.CHECKOUT:
-          return checkoutItem ? (
-            <CheckoutScreen
-              item={checkoutItem}
-              onBack={() => { setCurrentScreen(AppScreen.DETAILS); pushRoute(AppScreen.DETAILS, { id: checkoutItem.id }); }}
-              onSuccess={() => { setCheckoutItem(null); setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
-            />
-          ) : null;
-        default:
+        return checkoutItem ? (
+          <CheckoutScreen
+            item={checkoutItem}
+            onBack={() => { setCurrentScreen(AppScreen.DETAILS); pushRoute(AppScreen.DETAILS, { id: checkoutItem.id }); }}
+            onSuccess={() => { setCheckoutItem(null); setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
+          />
+        ) : null;
+      default:
         return <FeedScreen items={items} onSelectItem={(item) => navigate(AppScreen.DETAILS, item)} onNavigate={navigate} selectedDistance={selectedDistance} onDistanceChange={setSelectedDistance} userLocation={userLocation} onOpenMap={() => navigate(AppScreen.MAP_LOCATION)} />;
     }
   };
