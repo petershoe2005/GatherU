@@ -73,10 +73,10 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ userId, onBack, o
             </div>
 
             {/* Profile Card overlapping hero */}
-            <div className="px-5 -mt-16 relative z-10">
-                <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+            <div className="px-5 -mt-10 relative z-10">
+                <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
                     {/* Avatar + Name */}
-                    <div className="flex flex-col items-center pt-0 -mt-12 px-6 pb-5">
+                    <div className="flex flex-col items-center pt-5 px-6 pb-5">
                         <img
                             className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
                             src={profile.avatar_url || 'https://picsum.photos/seed/profile/200/200'}
