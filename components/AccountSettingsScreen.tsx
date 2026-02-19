@@ -32,8 +32,10 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
 
   // Avatar upload state
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputFilesRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showPhotoPicker, setShowPhotoPicker] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -124,8 +126,9 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
       setUploadingAvatar(false);
     }
 
-    // Reset file input so the same file can be re-selected
+    // Reset file inputs so the same file can be re-selected
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fileInputFilesRef.current) fileInputFilesRef.current.value = '';
   };
 
   return (
@@ -143,6 +146,7 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
 
           {/* Profile Picture */}
           <div className="flex flex-col items-center mb-5">
+            {/* Hidden file inputs */}
             <input
               ref={fileInputRef}
               type="file"
@@ -150,8 +154,15 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
               onChange={handleAvatarChange}
               className="hidden"
             />
+            <input
+              ref={fileInputFilesRef}
+              type="file"
+              accept="image/*,.png,.jpg,.jpeg,.webp,.gif"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
             <button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => setShowPhotoPicker(true)}
               className="relative group"
               disabled={uploadingAvatar}
             >
@@ -399,6 +410,49 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
               )}
             </button>
           </main>
+        </div>
+      )}
+
+      {/* Photo Source Picker Action Sheet */}
+      {showPhotoPicker && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-center" onClick={() => setShowPhotoPicker(false)}>
+          <div className="w-full max-w-md mx-auto p-4 pb-8 animate-in slide-in-from-bottom duration-300" onClick={e => e.stopPropagation()}>
+            <div className="bg-surface-dark border border-border-dark rounded-2xl overflow-hidden shadow-2xl mb-3">
+              <div className="px-4 pt-4 pb-2 text-center">
+                <p className="text-[11px] font-bold tracking-widest text-slate-500 uppercase">Change Profile Photo</p>
+              </div>
+              <button
+                onClick={() => { setShowPhotoPicker(false); setTimeout(() => fileInputRef.current?.click(), 100); }}
+                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-white/5 transition-colors border-t border-border-dark"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <span className="material-icons-round">photo_library</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-base text-white">Photo Album</p>
+                  <p className="text-xs text-slate-400">Choose from your camera roll</p>
+                </div>
+              </button>
+              <button
+                onClick={() => { setShowPhotoPicker(false); setTimeout(() => fileInputFilesRef.current?.click(), 100); }}
+                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-white/5 transition-colors border-t border-border-dark"
+              >
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                  <span className="material-icons-round">folder_open</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-base text-white">Choose File</p>
+                  <p className="text-xs text-slate-400">Browse from your files</p>
+                </div>
+              </button>
+            </div>
+            <button
+              onClick={() => setShowPhotoPicker(false)}
+              className="w-full bg-surface-dark border border-border-dark rounded-2xl py-4 text-center font-bold text-primary hover:bg-white/5 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
 
