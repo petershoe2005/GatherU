@@ -93,9 +93,11 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
     }
   };
 
-  // Track view count
+  // Track view count (guard against double-fire in strict mode)
+  const viewCountedRef = useRef(false);
   useEffect(() => {
-    if (item.id) {
+    if (item.id && !viewCountedRef.current) {
+      viewCountedRef.current = true;
       incrementViewCount(item.id);
     }
   }, [item.id]);
