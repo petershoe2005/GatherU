@@ -289,7 +289,6 @@ const AppContent: React.FC = () => {
       case AppScreen.MY_LISTINGS:
         return (
           <MyListingsScreen
-            items={items.filter(item => item.seller_id === profile?.id)}
             onBack={() => navigate(AppScreen.PROFILE)}
             onSelectItem={(item) => navigate(AppScreen.DETAILS, item)}
             onAddListing={() => navigate(AppScreen.CREATE)}

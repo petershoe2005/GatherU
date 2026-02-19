@@ -1,16 +1,30 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Item } from '../types';
+import { useAuth } from '../contexts/useAuth';
+import { fetchMyListings } from '../services/itemsService';
 
 interface MyListingsScreenProps {
-  items: Item[];
   onBack: () => void;
   onSelectItem: (item: Item) => void;
   onAddListing: () => void;
 }
 
-const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ items, onBack, onSelectItem, onAddListing }) => {
+const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectItem, onAddListing }) => {
+  const { user } = useAuth();
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'Active' | 'Sold'>('Active');
+
+  useEffect(() => {
+    const load = async () => {
+      if (!user) return;
+      const data = await fetchMyListings(user.id);
+      setItems(data);
+      setLoading(false);
+    };
+    load();
+  }, [user]);
 
   const activeItems = items.filter(i => i.status !== 'sold');
   const soldItems = items.filter(i => i.status === 'sold');
@@ -29,13 +43,13 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ items, onBack, onSe
           </button>
         </div>
         <div className="flex p-1 bg-surface-dark rounded-xl">
-          <button 
+          <button
             onClick={() => setActiveTab('Active')}
             className={`flex-1 py-2 text-sm font-semibold rounded-[10px] transition-all ${activeTab === 'Active' ? 'bg-slate-700 shadow-sm text-white' : 'text-slate-500'}`}
           >
             Active
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('Sold')}
             className={`flex-1 py-2 text-sm font-semibold rounded-[10px] transition-all ${activeTab === 'Sold' ? 'bg-slate-700 shadow-sm text-white' : 'text-slate-500'}`}
           >
@@ -48,9 +62,13 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ items, onBack, onSe
         <div className="mb-4">
           <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">{activeTab} Listings ({displayItems.length})</h2>
         </div>
-        
+
         <div className="space-y-4">
-          {displayItems.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : displayItems.length === 0 ? (
             <div className="py-20 text-center opacity-20">
               <span className="material-icons text-6xl mb-2">inventory_2</span>
               <p className="text-sm font-bold uppercase tracking-widest">No listings found</p>
