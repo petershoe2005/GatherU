@@ -85,6 +85,7 @@ export interface Item {
   is_furnished?: boolean;
   utilities_included?: boolean;
   sqft?: number;
+  bid_increment?: number;
 }
 
 export interface Category {

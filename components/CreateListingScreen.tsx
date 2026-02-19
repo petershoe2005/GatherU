@@ -21,6 +21,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
   const [category, setCategory] = useState('tech');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('cash');
   const [listingType, setListingType] = useState<'auction' | 'fixed' | 'both'>('auction');
+  const [bidIncrement, setBidIncrement] = useState('1');
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -82,6 +83,10 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       if (sqft) itemData.sqft = parseInt(sqft);
     } else if (listingType !== 'auction') {
       itemData.buy_now_price = parseFloat(buyNowPrice);
+    }
+
+    if (listingType !== 'fixed') {
+      itemData.bid_increment = parseFloat(bidIncrement) || 1;
     }
 
     const newItem = await createItem(itemData);
@@ -298,6 +303,24 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                       <option>3 Days</option>
                       <option>5 Days</option>
                       <option>1 Week</option>
+                    </select>
+                  </div>
+                )}
+                {listingType !== 'fixed' && (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Bid Increment</label>
+                    <select
+                      value={bidIncrement}
+                      onChange={(e) => setBidIncrement(e.target.value)}
+                      className="w-full bg-white border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-3 px-4 text-sm appearance-none text-secondary"
+                    >
+                      <option value="1">$1</option>
+                      <option value="2">$2</option>
+                      <option value="5">$5</option>
+                      <option value="10">$10</option>
+                      <option value="25">$25</option>
+                      <option value="50">$50</option>
+                      <option value="100">$100</option>
                     </select>
                   </div>
                 )}
