@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/useAuth';
 import { Item, Bid } from '../types';
 import { fetchBidsForItem, subscribeToBids } from '../services/bidsService';
-import PriceChart from './PriceChart';
+import { useCountdown } from '../lib/useCountdown';
 
 interface ItemLiveStatusScreenProps {
   item: Item;
@@ -15,11 +15,10 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
   const { user } = useAuth();
   const [currentPrice, setCurrentPrice] = useState(item.currentBid);
   const [bids, setBids] = useState<Bid[]>([]);
-  const [priceHistory, setPriceHistory] = useState<{ price: number; time: string }[]>([
-    { price: item.startingPrice, time: 'Start' }
-  ]);
   const [loading, setLoading] = useState(true);
   const isEnded = item.status === 'sold' || item.status === 'ended';
+  const countdown = useCountdown(item.ends_at);
+  const isUrgent = countdown !== 'Ended' && !countdown.includes('d') && !countdown.includes('h');
 
   // Load bid history
   useEffect(() => {
@@ -27,17 +26,6 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
       const data = await fetchBidsForItem(item.id);
       setBids(data);
       setLoading(false);
-
-      // Build price history from bids
-      const history = [{ price: item.startingPrice, time: 'Start' }];
-      data.reverse().forEach((bid: Bid) => {
-        const date = new Date(bid.created_at);
-        history.push({
-          price: Number(bid.amount),
-          time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
-      });
-      setPriceHistory(history);
 
       if (data.length > 0) {
         setCurrentPrice(Number(data[0].amount));
@@ -52,10 +40,6 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
       const newBid = payload.new as Bid;
       setCurrentPrice(Number(newBid.amount));
       setBids(prev => [newBid, ...prev]);
-      setPriceHistory(prev => [...prev, {
-        price: Number(newBid.amount),
-        time: new Date(newBid.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }]);
     });
 
     return () => {
@@ -63,8 +47,25 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
     };
   }, [item.id]);
 
-  // Simple bar chart
-  const maxPrice = Math.max(...priceHistory.map(p => p.price), item.startingPrice + 10);
+  // Get unique bidders for avatar row
+  const uniqueBidders = bids.reduce((acc, bid) => {
+    if (bid.bidder && !acc.find(b => b.id === bid.bidder?.id)) {
+      acc.push(bid.bidder);
+    }
+    return acc;
+  }, [] as NonNullable<Bid['bidder']>[]);
+
+  const formatBidTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMin = Math.floor(diffMs / (1000 * 60));
+    if (diffMin < 1) return 'just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHours = Math.floor(diffMin / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
 
   return (
     <div className="flex-1 bg-background-dark text-white min-h-screen font-display">
@@ -80,7 +81,7 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
         </div>
       </header>
 
-      <div className="px-4 space-y-6 pb-24">
+      <div className="px-4 space-y-4 pb-24">
         {/* Item Summary */}
         <div className="bg-surface-dark border border-border-dark rounded-2xl p-4 flex gap-4">
           <img className="w-16 h-16 rounded-xl object-cover" src={item.images[0]} alt={item.title} />
@@ -93,55 +94,114 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
           </div>
         </div>
 
-        {/* Price Chart */}
-        <div className="bg-surface-dark border border-border-dark rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-border-dark bg-slate-800/50">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Live Market Activity</h3>
+        {/* Countdown Timer */}
+        {!isEnded && item.ends_at && (
+          <div className={`rounded-2xl p-5 border text-center transition-colors ${isUrgent
+            ? 'bg-red-500/10 border-red-500/30'
+            : 'bg-surface-dark border-border-dark'
+            }`}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
+              {isUrgent ? '⚡ Ending Soon' : 'Time Remaining'}
+            </p>
+            <div className={`text-3xl font-black tracking-tight ${isUrgent ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+              {countdown}
+            </div>
+            {isUrgent && (
+              <p className="text-[10px] text-red-400/70 mt-2 font-medium">
+                Place your bid before it's too late!
+              </p>
+            )}
           </div>
-          <PriceChart data={priceHistory} height={220} />
-        </div>
+        )}
 
-        {/* Stats */}
+        {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-surface-dark border border-border-dark rounded-xl p-3 text-center">
             <p className="text-lg font-black text-primary">{bids.length}</p>
             <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Total Bids</p>
           </div>
           <div className="bg-surface-dark border border-border-dark rounded-xl p-3 text-center">
-            <p className="text-lg font-black text-white">{item.activeBidders}</p>
+            <p className="text-lg font-black text-white">{uniqueBidders.length || item.activeBidders}</p>
             <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Bidders</p>
           </div>
           <div className="bg-surface-dark border border-border-dark rounded-xl p-3 text-center">
             <p className="text-lg font-black text-amber-400">{item.viewCount}</p>
-            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Views</p>
+            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Watching</p>
           </div>
         </div>
 
-        {/* Recent Bids */}
-        <div className="bg-surface-dark border border-border-dark rounded-2xl p-4">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Recent Bids</h3>
+        {/* Bidder Avatars Row */}
+        {uniqueBidders.length > 0 && (
+          <div className="bg-surface-dark border border-border-dark rounded-2xl px-4 py-3 flex items-center gap-3">
+            <div className="flex -space-x-2">
+              {uniqueBidders.slice(0, 5).map((bidder, i) => (
+                <div key={bidder.id} className="relative" style={{ zIndex: 5 - i }}>
+                  {bidder.avatar_url ? (
+                    <img
+                      className="w-8 h-8 rounded-full object-cover border-2 border-background-dark"
+                      src={bidder.avatar_url}
+                      alt={bidder.name}
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/80 to-amber-500/80 border-2 border-background-dark flex items-center justify-center text-[10px] font-bold text-white">
+                      {(bidder.name || 'U')[0]}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {uniqueBidders.length > 5 && (
+                <div className="w-8 h-8 rounded-full bg-slate-700 border-2 border-background-dark flex items-center justify-center text-[9px] font-bold text-slate-300">
+                  +{uniqueBidders.length - 5}
+                </div>
+              )}
+            </div>
+            <p className="text-[11px] text-slate-400 flex-1">
+              <span className="text-white font-semibold">{uniqueBidders[0]?.name}</span>
+              {uniqueBidders.length > 1 && (
+                <> and <span className="text-white font-semibold">{uniqueBidders.length - 1} other{uniqueBidders.length > 2 ? 's' : ''}</span></>
+              )}
+              {' '}placed bids
+            </p>
+          </div>
+        )}
+
+        {/* Bid Activity Feed */}
+        <div className="bg-surface-dark border border-border-dark rounded-2xl overflow-hidden">
+          <div className="p-4 border-b border-border-dark bg-slate-800/50 flex items-center justify-between">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Bid Activity</h3>
+            <span className="text-[10px] text-slate-500">{bids.length} bid{bids.length !== 1 ? 's' : ''}</span>
+          </div>
           {loading ? (
-            <div className="flex justify-center py-6">
+            <div className="flex justify-center py-8">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : bids.length === 0 ? (
-            <p className="text-center text-sm text-slate-500 py-6">No bids yet</p>
+            <div className="py-10 text-center">
+              <span className="material-icons-round text-3xl text-slate-600 mb-2">gavel</span>
+              <p className="text-sm text-slate-500 font-medium">No bids yet</p>
+              <p className="text-[10px] text-slate-600 mt-1">Be the first to place a bid!</p>
+            </div>
           ) : (
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {bids.slice(0, 10).map((bid, i) => (
-                <div key={bid.id || i} className="flex items-center justify-between py-2 border-b border-border-dark last:border-0">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">
+            <div className="divide-y divide-border-dark max-h-64 overflow-y-auto">
+              {bids.slice(0, 15).map((bid, i) => (
+                <div key={bid.id || i} className={`flex items-center gap-3 px-4 py-3 transition-colors ${i === 0 ? 'bg-primary/5' : 'hover:bg-white/[0.02]'}`}>
+                  {bid.bidder?.avatar_url ? (
+                    <img className="w-9 h-9 rounded-full object-cover border-2 border-border-dark" src={bid.bidder.avatar_url} alt="" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-xs font-bold text-white border-2 border-border-dark">
                       {(bid.bidder?.name || 'U')[0]}
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold">{bid.bidder?.name || 'Anonymous'}</p>
-                      <p className="text-[10px] text-slate-500">
-                        {new Date(bid.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </p>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-white truncate">{bid.bidder?.name || 'Anonymous'}</span>
+                      {i === 0 && (
+                        <span className="text-[8px] font-black uppercase bg-primary/20 text-primary px-1.5 py-0.5 rounded-full tracking-wider">Highest</span>
+                      )}
                     </div>
+                    <p className="text-[10px] text-slate-500">{formatBidTime(bid.created_at)}</p>
                   </div>
-                  <span className={`font-bold text-sm ${i === 0 ? 'text-primary' : 'text-slate-400'}`}>
+                  <span className={`font-bold text-sm tabular-nums ${i === 0 ? 'text-primary' : 'text-slate-400'}`}>
                     ${Number(bid.amount).toFixed(2)}
                   </span>
                 </div>
