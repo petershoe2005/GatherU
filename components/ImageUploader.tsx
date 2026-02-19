@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { compressImage, uploadImages } from '../services/storageService';
+import { compressImage, uploadImage } from '../services/storageService';
 
 interface ImageUploaderProps {
     images: string[];
@@ -20,16 +20,20 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onImagesChange, m
 
         setUploading(true);
         setProgress({ done: 0, total: files.length });
+        let completed = 0;
 
-        // Compress all files first
-        const compressed = await Promise.all(
-            files.map(f => compressImage(f, 1200, 0.85))
+        // Compress + upload each file in parallel
+        const results = await Promise.all(
+            files.map(async (f) => {
+                const compressed = await compressImage(f, 1200, 0.85);
+                const url = await uploadImage(compressed, 'listings');
+                completed++;
+                setProgress({ done: completed, total: files.length });
+                return url;
+            })
         );
 
-        // Upload with progress tracking
-        const newUrls = await uploadImages(compressed, 'listings', (done, total) => {
-            setProgress({ done, total });
-        });
+        const newUrls = results.filter((u): u is string => u !== null);
 
         if (newUrls.length > 0) {
             onImagesChange([...images, ...newUrls]);
@@ -81,8 +85,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onImagesChange, m
                         onDragLeave={() => setIsDragging(false)}
                         onDrop={handleDrop}
                         className={`flex-shrink-0 w-32 h-32 rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${isDragging
-                                ? 'border-primary bg-primary/10 text-primary scale-105'
-                                : 'border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:border-primary hover:text-primary'
+                            ? 'border-primary bg-primary/10 text-primary scale-105'
+                            : 'border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:border-primary hover:text-primary'
                             }`}
                     >
                         {uploading ? (
