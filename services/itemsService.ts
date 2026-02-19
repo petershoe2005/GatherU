@@ -6,11 +6,19 @@ export const fetchItems = async (filters?: {
     category?: string;
     search?: string;
     sortBy?: 'newest' | 'price-asc' | 'price-desc';
+    institution?: string;
 }): Promise<Item[]> => {
+    // If filtering by institution, use inner join to only get items from sellers at that school
+    const profileJoin = filters?.institution ? 'profiles!inner(*)' : 'profiles(*)';
+
     let query = supabase
         .from('items')
-        .select('*, profiles(*)')
+        .select(`*, ${profileJoin}`)
         .neq('status', 'ended');
+
+    if (filters?.institution) {
+        query = query.eq('profiles.institution', filters.institution);
+    }
 
     if (filters?.category && filters.category !== 'all') {
         query = query.eq('category', filters.category);

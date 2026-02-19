@@ -123,7 +123,7 @@ const AppContent: React.FC = () => {
     if (currentScreen === AppScreen.FEED || currentScreen === AppScreen.DETAILS) {
       loadItems();
     }
-  }, [currentScreen]);
+  }, [currentScreen, profile?.institution]);
 
   // Subscribe to realtime item changes
   useEffect(() => {
@@ -136,7 +136,11 @@ const AppContent: React.FC = () => {
   }, []);
 
   const loadItems = async () => {
-    const data = await fetchItems();
+    // Verified students see items from their school; local members see all
+    const filters = profile?.is_verified && profile?.institution
+      ? { institution: profile.institution }
+      : undefined;
+    const data = await fetchItems(filters);
     if (data.length > 0) {
       setItems(data);
     }
