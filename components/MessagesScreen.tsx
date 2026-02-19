@@ -30,8 +30,8 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
 
   useEffect(() => {
     if (user) {
-      loadConversations();
-      loadNotifications();
+      // Fetch both in parallel on mount
+      Promise.all([loadConversations(), loadNotifications()]).then(() => setLoading(false));
 
       // Realtime: refresh conversation list when any conversation changes
       const channel = subscribeToConversations(user.id, () => {
@@ -45,10 +45,8 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
 
   const loadConversations = async () => {
     if (!user) return;
-    setLoading(true);
     const data = await fetchConversations(user.id);
     setConversations(data);
-    setLoading(false);
   };
 
   const loadNotifications = async () => {
