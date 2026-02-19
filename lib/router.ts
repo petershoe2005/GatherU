@@ -28,6 +28,7 @@ const SCREEN_ROUTES: Record<AppScreen, string> = {
     [AppScreen.NOTIFICATIONS]: '/notifications',
     [AppScreen.FAVORITES]: '/favorites',
     [AppScreen.CHECKOUT]: '/checkout',
+    [AppScreen.USER_PROFILE]: '/user',
 };
 
 const ROUTE_TO_SCREEN = Object.fromEntries(
