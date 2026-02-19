@@ -229,7 +229,7 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
               </div>
               <div className="relative pt-1 px-1">
                 <input
-                  className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary"
+                  className="w-full h-2.5 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-primary"
                   max="50" min="1" type="range"
                   value={gpsRadius}
                   onChange={(e) => {
