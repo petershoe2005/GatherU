@@ -89,11 +89,11 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
 
   const handleSaveName = async () => {
     if (!profile || !newName.trim()) return;
-    setSavingName(true);
-    await updateProfile(profile.id, { name: newName.trim() });
-    await refreshProfile();
-    setSavingName(false);
+    const trimmedName = newName.trim();
+    // Optimistic: close modal and show new name instantly
     setShowEditName(false);
+    // Fire Supabase update in background (no await blocking the UI)
+    updateProfile(profile.id, { name: trimmedName }).then(() => refreshProfile());
   };
 
   return (
