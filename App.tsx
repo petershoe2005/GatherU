@@ -47,8 +47,11 @@ const AppContent: React.FC = () => {
           const { latitude, longitude } = position.coords;
           try {
             // Reverse geocode to get city name
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
-            const data = await res.json();
+              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+              if (!res.ok) throw new Error('Geocode failed');
+              const text = await res.text();
+              if (!text) throw new Error('Empty response');
+              const data = JSON.parse(text);
             const cityName = data?.address?.city || data?.address?.town || data?.address?.village || 'Current Location';
 
             setUserLocation({

@@ -36,7 +36,7 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
 
     const channel = subscribeToMessages(conversationId, (payload: any) => {
       const newMsg = payload.new as ChatMessage;
-      setMessages(prev => [...prev, newMsg]);
+      setMessages(prev => prev.some(m => m.id === newMsg.id) ? prev : [...prev, newMsg]);
     });
 
     return () => {
@@ -63,8 +63,13 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ conversationId, onB
     const text = newMessage.trim();
     setNewMessage('');
 
-    await sendMessage(conversationId, user.id, text);
-    // The realtime subscription will add the message
+    const sent = await sendMessage(conversationId, user.id, text);
+    // Add optimistically — realtime will be deduplicated by ID
+    if (sent) {
+      setMessages(prev =>
+        prev.some(m => m.id === sent.id) ? prev : [...prev, sent]
+      );
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

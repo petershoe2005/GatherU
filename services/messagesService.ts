@@ -31,20 +31,21 @@ export const fetchConversationById = async (conversationId: string, currentUserI
         .from('conversations')
         .select('*, buyer:profiles!conversations_buyer_id_fkey(*), seller:profiles!conversations_seller_id_fkey(*), items(*)')
         .eq('id', conversationId)
-        .single();
+        .limit(1);
 
-    if (error || !data) return null;
+    if (error || !data || data.length === 0) return null;
+    const row = data[0];
 
     return {
-        id: data.id,
-        item_id: data.item_id,
-        buyer_id: data.buyer_id,
-        seller_id: data.seller_id,
-        last_message: data.last_message,
-        last_message_at: data.last_message_at,
-        created_at: data.created_at,
-        other_user: data.buyer_id === currentUserId ? data.seller : data.buyer,
-        item: data.items,
+        id: row.id,
+        item_id: row.item_id,
+        buyer_id: row.buyer_id,
+        seller_id: row.seller_id,
+        last_message: row.last_message,
+        last_message_at: row.last_message_at,
+        created_at: row.created_at,
+        other_user: row.buyer_id === currentUserId ? row.seller : row.buyer,
+        item: row.items,
     } as Conversation;
 };
 
@@ -86,6 +87,12 @@ export const sendMessage = async (
         console.error('Error sending message:', error);
         return null;
     }
+
+    // Update the conversation's last_message so the list stays current
+    await supabase
+        .from('conversations')
+        .update({ last_message: text, last_message_at: data.created_at })
+        .eq('id', conversationId);
 
     return data as ChatMessage;
 };
@@ -139,6 +146,26 @@ export const subscribeToMessages = (
                 table: 'messages',
                 filter: `conversation_id=eq.${conversationId}`,
             },
+            callback
+        )
+        .subscribe();
+};
+
+export const subscribeToConversations = (
+    userId: string,
+    callback: () => void
+) => {
+    // Listen for any UPDATE on conversations (last_message changes) or new INSERTs
+    return supabase
+        .channel(`conversations-${userId}`)
+        .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'conversations' },
+            callback
+        )
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'conversations' },
             callback
         )
         .subscribe();

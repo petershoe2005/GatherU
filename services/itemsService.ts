@@ -46,7 +46,7 @@ export const fetchItemById = async (id: string): Promise<Item | null> => {
         .from('items')
         .select('*, profiles(*)')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
     if (error || !data) return null;
     return dbItemToItem(data);
@@ -109,7 +109,7 @@ export const incrementViewCount = async (id: string): Promise<void> => {
         .from('items')
         .select('view_count')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
     if (data) {
         await supabase

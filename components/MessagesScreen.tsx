@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { AppScreen, Conversation, AppNotification } from '../types';
 import { useAuth } from '../contexts/useAuth';
-import { fetchConversations } from '../services/messagesService';
+import { fetchConversations, subscribeToConversations } from '../services/messagesService';
 import { fetchNotifications, markNotificationRead, deleteNotification } from '../services/notificationsService';
 import BottomNav from './BottomNav';
 
@@ -32,6 +32,12 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
     if (user) {
       loadConversations();
       loadNotifications();
+
+      // Realtime: refresh conversation list when any conversation changes
+      const channel = subscribeToConversations(user.id, () => {
+        loadConversations();
+      });
+      return () => { channel.unsubscribe(); };
     } else {
       setLoading(false);
     }
@@ -69,7 +75,8 @@ const MessagesScreen: React.FC<MessagesScreenProps> = ({ onNavigate, onOpenChat 
 
   const unreadNotifs = notifications.filter(n => !n.read).length;
 
-  const formatTime = (dateStr: string) => {
+  const formatTime = (dateStr: string | null | undefined) => {
+    if (!dateStr) return '';
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();

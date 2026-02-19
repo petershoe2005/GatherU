@@ -14,14 +14,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             .from('profiles')
             .select('*')
             .eq('id', userId)
-            .single();
+            .maybeSingle();
+
+        if (!data && !error) {
+            // Profile doesn't exist yet — create it
+            const { data: newProfile } = await supabase
+                .from('profiles')
+                .upsert({ id: userId }, { onConflict: 'id' })
+                .select('*')
+                .maybeSingle();
+            if (newProfile) setProfile(newProfile as Profile);
+            return newProfile as Profile | null;
+        }
 
         if (error && (error.code === 'PGRST116' || error.code === '406')) {
             const { data: newProfile } = await supabase
                 .from('profiles')
                 .upsert({ id: userId }, { onConflict: 'id' })
                 .select('*')
-                .single();
+                .maybeSingle();
             if (newProfile) setProfile(newProfile as Profile);
             return newProfile as Profile | null;
         }
@@ -45,20 +56,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 console.warn('Supabase connection timed out — proceeding without session');
                 setLoading(false);
             }
-        }, 5000);
+        }, 15000);
 
         supabase.auth.getSession()
             .then(({ data: { session: s } }) => {
-                if (didTimeout) return;
+                clearTimeout(timeout);
                 setSession(s);
                 setUser(s?.user ?? null);
                 if (s?.user) {
-                    fetchProfile(s.user.id).finally(() => {
-                        clearTimeout(timeout);
-                        setLoading(false);
-                    });
+                    fetchProfile(s.user.id).finally(() => setLoading(false));
                 } else {
-                    clearTimeout(timeout);
                     setLoading(false);
                 }
             })

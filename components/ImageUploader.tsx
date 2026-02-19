@@ -34,9 +34,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onImagesChange, m
         if (newUrls.length > 0) {
             onImagesChange([...images, ...newUrls]);
         } else {
-            // Fallback: use local preview if upload fails (no Supabase Storage configured)
-            const localPreviews = files.map(f => URL.createObjectURL(f));
-            onImagesChange([...images, ...localPreviews]);
+            alert('Image upload failed. Please try again.');
         }
 
         setUploading(false);
