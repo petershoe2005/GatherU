@@ -30,13 +30,60 @@ export const createOrder = async (
     return data as Order;
 };
 
-export const confirmDelivery = async (orderId: string): Promise<boolean> => {
+export const fetchOrderForItem = async (itemId: string, userId: string): Promise<Order | null> => {
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('item_id', itemId)
+        .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+    if (error) return null;
+    return data as Order;
+};
+
+export const sellerConfirmDelivery = async (orderId: string): Promise<boolean> => {
     const { error } = await supabase
         .from('orders')
-        .update({ status: 'delivered', updated_at: new Date().toISOString() })
+        .update({ seller_confirmed: true, updated_at: new Date().toISOString() })
         .eq('id', orderId);
-
     return !error;
+};
+
+export const buyerConfirmDelivery = async (orderId: string): Promise<boolean> => {
+    const { error } = await supabase
+        .from('orders')
+        .update({
+            buyer_confirmed: true,
+            status: 'delivered',
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', orderId);
+    return !error;
+};
+
+export const rejectDelivery = async (
+    orderId: string,
+    userId: string,
+    reason: string
+): Promise<boolean> => {
+    const { error } = await supabase
+        .from('orders')
+        .update({
+            status: 'rejected',
+            rejection_reason: reason,
+            rejected_by: userId,
+            rejected_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', orderId);
+    return !error;
+};
+
+export const confirmDelivery = async (orderId: string): Promise<boolean> => {
+    return buyerConfirmDelivery(orderId);
 };
 
 export const submitReview = async (

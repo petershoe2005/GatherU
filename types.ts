@@ -133,7 +133,12 @@ export interface Order {
   seller_id: string;
   final_price: number;
   platform_fee: number;
-  status: 'pending' | 'delivered' | 'rated';
+  status: 'pending' | 'delivered' | 'rated' | 'rejected';
+  seller_confirmed: boolean;
+  buyer_confirmed: boolean;
+  rejection_reason: string | null;
+  rejected_by: string | null;
+  rejected_at: string | null;
   rating: number | null;
   review_comment: string;
   created_at: string;

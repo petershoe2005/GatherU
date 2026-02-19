@@ -377,22 +377,33 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
       {/* Action Footer */}
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/90 backdrop-blur-xl border-t border-slate-200 p-4 z-40">
         {isOwner ? (
-          <div className="flex gap-3">
-            <button
-              onClick={onEndBidding}
-              disabled={isEnded}
-              className="flex-1 bg-red-500/10 text-red-500 font-bold py-3.5 rounded-xl border border-red-500/20 disabled:opacity-40"
-            >
-              {isHousing ? 'Remove Listing' : 'End Auction'}
-            </button>
-            <button
-              onClick={onViewLive}
-              className="flex-1 bg-primary text-slate-900 font-bold py-3.5 rounded-xl"
-            >
-              View Stats
-            </button>
-          </div>
-        ) : isHousing ? (
+           isEnded ? (
+             /* Seller: auction ended — they can confirm delivery */
+             <button
+               onClick={onConfirmDelivery}
+               className="w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+             >
+               <span className="material-icons-round text-sm">inventory_2</span>
+               Confirm Delivery
+             </button>
+           ) : (
+             <div className="flex gap-3">
+               <button
+                 onClick={onEndBidding}
+                 disabled={isEnded}
+                 className="flex-1 bg-red-500/10 text-red-500 font-bold py-3.5 rounded-xl border border-red-500/20 disabled:opacity-40"
+               >
+                 {isHousing ? 'Remove Listing' : 'End Auction'}
+               </button>
+               <button
+                 onClick={onViewLive}
+                 className="flex-1 bg-primary text-slate-900 font-bold py-3.5 rounded-xl"
+               >
+                 View Stats
+               </button>
+             </div>
+           )
+         ) : isHousing ? (
           /* Housing Contact Button */
           <button
             onClick={onMessageSeller}
