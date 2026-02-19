@@ -341,6 +341,14 @@ const AppContent: React.FC = () => {
             onMessage={() => {
               if (selectedItem) handleMessageSeller();
             }}
+            initialData={selectedItem ? {
+              name: selectedItem.seller.name,
+              avatar: selectedItem.seller.avatar,
+              institution: selectedItem.seller.institution,
+              rating: selectedItem.seller.rating,
+              reviewsCount: selectedItem.seller.reviewsCount,
+              isVerified: selectedItem.seller.isVerified,
+            } : undefined}
           />
         ) : null;
       default:

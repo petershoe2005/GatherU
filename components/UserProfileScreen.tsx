@@ -8,17 +8,37 @@ interface UserProfileScreenProps {
     userId: string;
     onBack: () => void;
     onMessage?: () => void;
+    initialData?: {
+        name: string;
+        avatar: string;
+        institution?: string;
+        rating?: number;
+        reviewsCount?: number;
+        isVerified?: boolean;
+    };
 }
 
-const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ userId, onBack, onMessage }) => {
-    const [profile, setProfile] = useState<Profile | null>(null);
+const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ userId, onBack, onMessage, initialData }) => {
+    const [profile, setProfile] = useState<Profile | null>(
+        initialData ? {
+            id: userId,
+            name: initialData.name,
+            avatar_url: initialData.avatar,
+            institution: initialData.institution || '',
+            rating: initialData.rating || 0,
+            reviews_count: initialData.reviewsCount || 0,
+            is_verified: initialData.isVerified || false,
+            username: '', email: '', location: '', gps_radius: 5,
+            accept_cash: true, bidding_alerts: true, message_alerts: true,
+            created_at: '', updated_at: '',
+        } as Profile : null
+    );
     const [stats, setStats] = useState({ itemsSold: 0, itemsBought: 0 });
     const [reviews, setReviews] = useState<Review[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!initialData);
 
     useEffect(() => {
         const load = async () => {
-            setLoading(true);
             const [publicData, reviewsData] = await Promise.all([
                 fetchPublicProfile(userId),
                 fetchReviewsForSeller(userId),
@@ -32,6 +52,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ userId, onBack, o
     }, [userId]);
 
     const formatDate = (dateStr: string) => {
+        if (!dateStr) return '';
         const date = new Date(dateStr);
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
