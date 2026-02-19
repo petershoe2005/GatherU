@@ -6,6 +6,7 @@ import { useAuth } from './contexts/useAuth';
 import { fetchItems, subscribeToItems } from './services/itemsService';
 import { createConversation } from './services/messagesService';
 import { pushRoute, parseHash, onRouteChange } from './lib/router';
+import { haversineDistance } from './lib/geo';
 import VerifyScreen from './components/VerifyScreen';
 import LoginScreen from './components/LoginScreen';
 import SetupProfileScreen from './components/SetupProfileScreen';
@@ -123,7 +124,7 @@ const AppContent: React.FC = () => {
     if (currentScreen === AppScreen.FEED || currentScreen === AppScreen.DETAILS) {
       loadItems();
     }
-  }, [currentScreen, profile?.institution]);
+  }, [currentScreen, profile?.institution, profile?.gps_radius, userLocation]);
 
   // Subscribe to realtime item changes
   useEffect(() => {
@@ -136,13 +137,41 @@ const AppContent: React.FC = () => {
   }, []);
 
   const loadItems = async () => {
-    // Verified students see items from their school; local members see all
-    const filters = profile?.is_verified && profile?.institution
-      ? { institution: profile.institution }
-      : undefined;
-    const data = await fetchItems(filters);
-    if (data.length > 0) {
-      setItems(data);
+    const allItems = await fetchItems();
+    if (allItems.length === 0) return;
+
+    // Apply school + radius filtering
+    if (profile && userLocation.lat && userLocation.lng) {
+      const radius = profile.gps_radius || 5;
+      const isStudent = profile.is_verified && !!profile.institution;
+
+      const filtered = allItems.filter(item => {
+        // Check if same school (for .edu students)
+        const sameSchool = isStudent && item.seller?.institution === profile.institution;
+
+        // Check if within radius (only for items with coordinates)
+        let withinRadius = false;
+        if (item.latitude != null && item.longitude != null) {
+          const dist = haversineDistance(
+            userLocation.lat, userLocation.lng,
+            item.latitude, item.longitude
+          );
+          withinRadius = dist <= radius;
+        }
+
+        if (isStudent) {
+          // Students see: same school items (regardless of coords) + nearby items within radius
+          return sameSchool || withinRadius;
+        } else {
+          // Local members see: only items within radius (must have coords)
+          return withinRadius;
+        }
+      });
+
+      // If filtering results in nothing (e.g. no items have coords yet), show all for now
+      setItems(filtered.length > 0 ? filtered : allItems);
+    } else {
+      setItems(allItems);
     }
   };
 

@@ -89,6 +89,17 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       itemData.bid_increment = parseFloat(bidIncrement) || 1;
     }
 
+    // Attach user's current location for radius-based feed filtering
+    try {
+      const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 })
+      );
+      itemData.latitude = pos.coords.latitude;
+      itemData.longitude = pos.coords.longitude;
+    } catch {
+      // Location unavailable — item will only show for same-school users
+    }
+
     const newItem = await createItem(itemData);
     setIsPublishing(false);
 

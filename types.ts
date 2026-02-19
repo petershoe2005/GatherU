@@ -86,6 +86,8 @@ export interface Item {
   utilities_included?: boolean;
   sqft?: number;
   bid_increment?: number;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface Category {
@@ -210,6 +212,8 @@ export function dbItemToItem(row: any, sellerProfile?: Profile): Item {
     is_furnished: row.is_furnished,
     utilities_included: row.utilities_included,
     sqft: row.sqft,
+    latitude: row.latitude ? Number(row.latitude) : null,
+    longitude: row.longitude ? Number(row.longitude) : null,
   };
 }
 
