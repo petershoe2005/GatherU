@@ -1,7 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/useAuth';
 import { updateSettings, updateProfile } from '../services/profileService';
+import { uploadImage, compressImage } from '../services/storageService';
 import { supabase } from '../lib/supabase';
 
 interface AccountSettingsScreenProps {
@@ -28,6 +29,11 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
   const [showEditName, setShowEditName] = useState(false);
   const [newName, setNewName] = useState(profile?.name || '');
   const [savingName, setSavingName] = useState(false);
+
+  // Avatar upload state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -96,6 +102,32 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
     updateProfile(profile.id, { name: trimmedName }).then(() => refreshProfile());
   };
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !profile) return;
+
+    // Show preview immediately
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+    setUploadingAvatar(true);
+
+    try {
+      const compressed = await compressImage(file, 400, 0.8);
+      const publicUrl = await uploadImage(compressed, 'avatars');
+      if (publicUrl) {
+        await updateProfile(profile.id, { avatar_url: publicUrl });
+        await refreshProfile();
+      }
+    } catch (err) {
+      console.error('Avatar upload failed:', err);
+    } finally {
+      setUploadingAvatar(false);
+    }
+
+    // Reset file input so the same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   return (
     <div className="flex-1 bg-background-dark text-slate-100 min-h-screen font-display overflow-y-auto pb-10">
       <header className="sticky top-0 z-10 px-6 py-4 flex items-center bg-background-dark/90 backdrop-blur-xl border-b border-border-dark">
@@ -108,6 +140,38 @@ const AccountSettingsScreen: React.FC<AccountSettingsScreenProps> = ({ onBack })
       <main className="px-5 space-y-8 mt-6">
         <section>
           <h2 className="text-[11px] font-bold tracking-widest text-slate-500 uppercase px-1 mb-2.5">Personal Info</h2>
+
+          {/* Profile Picture */}
+          <div className="flex flex-col items-center mb-5">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="relative group"
+              disabled={uploadingAvatar}
+            >
+              <img
+                className="w-24 h-24 rounded-full object-cover border-3 border-primary/30 shadow-lg shadow-primary/10"
+                src={avatarPreview || profile?.avatar_url || 'https://picsum.photos/seed/profile/200/200'}
+                alt="Profile"
+              />
+              <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="material-icons-round text-white text-2xl">photo_camera</span>
+              </div>
+              {uploadingAvatar && (
+                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                </div>
+              )}
+            </button>
+            <p className="text-[11px] text-slate-500 mt-2 font-medium">Tap to change photo</p>
+          </div>
+
           <div className="bg-surface-dark border border-border-dark overflow-hidden rounded-2xl">
             <div
               onClick={() => { setNewName(profile?.name || ''); setShowEditName(true); }}
