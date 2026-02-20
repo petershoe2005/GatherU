@@ -340,8 +340,8 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
                 <span className="material-icons-round">show_chart</span>
               </div>
               <div className="text-left">
-                <p className="font-bold text-sm text-secondary">Live Bidding Activity</p>
-                <p className="text-[11px] text-slate-400">View price history & charts</p>
+                <p className="font-bold text-sm text-secondary">{isEnded ? 'Bid History' : 'Live Bidding Activity'}</p>
+                <p className="text-[11px] text-slate-400">{isEnded ? 'View final price & history' : 'View price history & charts'}</p>
               </div>
             </div>
             <span className="material-icons-round text-slate-400 group-hover:text-primary transition-colors">chevron_right</span>

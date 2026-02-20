@@ -34,18 +34,18 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
     loadBids();
   }, [item.id]);
 
-  // Subscribe to realtime bid updates
+  // Only subscribe to realtime updates if auction is still active
   useEffect(() => {
+    if (isEnded) return;
     const channel = subscribeToBids(item.id, (payload: any) => {
       const newBid = payload.new as Bid;
       setCurrentPrice(Number(newBid.amount));
       setBids(prev => [newBid, ...prev]);
     });
-
     return () => {
       channel.unsubscribe();
     };
-  }, [item.id]);
+  }, [item.id, isEnded]);
 
   // Get unique bidders for avatar row
   const uniqueBidders = bids.reduce((acc, bid) => {
@@ -67,6 +67,10 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
+  // Calculate price increase from starting price to final price
+  const priceIncrease = currentPrice - item.startingPrice;
+  const priceIncreasePercent = item.startingPrice > 0 ? ((priceIncrease / item.startingPrice) * 100).toFixed(0) : '0';
+
   return (
     <div className="flex-1 bg-background-dark text-white min-h-screen font-display">
       {/* Header */}
@@ -74,8 +78,7 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
         <button onClick={onBack} className="p-2 rounded-full bg-surface-dark active:scale-90 transition-transform">
           <span className="material-icons-round text-white">arrow_back</span>
         </button>
-        <h1 className="text-lg font-bold">Live Auction</h1>
-
+        <h1 className="text-lg font-bold">{isEnded ? 'Bid History' : 'Live Auction'}</h1>
         <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${isEnded ? 'bg-red-500/20 text-red-400' : 'bg-primary/20 text-primary animate-blink'}`}>
           {isEnded ? 'Ended' : '● Live'}
         </div>
@@ -165,50 +168,76 @@ const ItemLiveStatusScreen: React.FC<ItemLiveStatusScreenProps> = ({ item, onBac
           </div>
         )}
 
-        {/* Bid Activity Feed */}
-        <div className="bg-surface-dark border border-border-dark rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-border-dark bg-slate-800/50 flex items-center justify-between">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Bid Activity</h3>
-            <span className="text-[10px] text-slate-500">{bids.length} bid{bids.length !== 1 ? 's' : ''}</span>
-          </div>
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : bids.length === 0 ? (
-            <div className="py-10 text-center">
-              <span className="material-icons-round text-3xl text-slate-600 mb-2">gavel</span>
-              <p className="text-sm text-slate-500 font-medium">No bids yet</p>
-              <p className="text-[10px] text-slate-600 mt-1">Be the first to place a bid!</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-border-dark max-h-64 overflow-y-auto">
-              {bids.slice(0, 15).map((bid, i) => (
-                <div key={bid.id || i} className={`flex items-center gap-3 px-4 py-3 transition-colors ${i === 0 ? 'bg-primary/5' : 'hover:bg-white/[0.02]'}`}>
-                  {bid.bidder?.avatar_url ? (
-                    <img className="w-9 h-9 rounded-full object-cover border-2 border-border-dark" src={bid.bidder.avatar_url} alt="" />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-xs font-bold text-white border-2 border-border-dark">
-                      {(bid.bidder?.name || 'U')[0]}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-semibold text-white truncate">{bid.bidder?.name || 'Anonymous'}</span>
-                      {i === 0 && (
-                        <span className="text-[8px] font-black uppercase bg-primary/20 text-primary px-1.5 py-0.5 rounded-full tracking-wider">Highest</span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-slate-500">{formatBidTime(bid.created_at)}</p>
-                  </div>
-                  <span className={`font-bold text-sm tabular-nums ${i === 0 ? 'text-primary' : 'text-slate-400'}`}>
-                    ${Number(bid.amount).toFixed(2)}
-                  </span>
-                </div>
-              ))}
+          {/* Final price summary for ended auctions */}
+          {isEnded && priceIncrease > 0 && (
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                <span className="material-icons-round text-emerald-400">trending_up</span>
+              </div>
+              <div>
+                <p className="text-[10px] text-emerald-400/70 font-bold uppercase tracking-wider">Final Price Increase</p>
+                <p className="text-lg font-black text-emerald-400">+${priceIncrease.toFixed(2)} <span className="text-sm font-bold">({priceIncreasePercent}%)</span></p>
+                <p className="text-[10px] text-slate-400">Started at ${item.startingPrice.toFixed(2)}</p>
+              </div>
             </div>
           )}
-        </div>
+
+          {/* Bid Activity Feed */}
+          <div className="bg-surface-dark border border-border-dark rounded-2xl overflow-hidden">
+            <div className="p-4 border-b border-border-dark bg-slate-800/50 flex items-center justify-between">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                {isEnded ? 'Price History' : 'Bid Activity'}
+              </h3>
+              <span className="text-[10px] text-slate-500">{bids.length} bid{bids.length !== 1 ? 's' : ''}</span>
+            </div>
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : bids.length === 0 ? (
+              <div className="py-10 text-center">
+                <span className="material-icons-round text-3xl text-slate-600 mb-2">gavel</span>
+                <p className="text-sm text-slate-500 font-medium">No bids placed</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-border-dark max-h-72 overflow-y-auto">
+                {bids.slice(0, 15).map((bid, i) => {
+                  const prevBid = bids[i + 1];
+                  const increase = prevBid ? Number(bid.amount) - Number(prevBid.amount) : Number(bid.amount) - item.startingPrice;
+                  return (
+                    <div key={bid.id || i} className={`flex items-center gap-3 px-4 py-3 transition-colors ${i === 0 ? 'bg-primary/5' : 'hover:bg-white/[0.02]'}`}>
+                      {bid.bidder?.avatar_url ? (
+                        <img className="w-9 h-9 rounded-full object-cover border-2 border-border-dark" src={bid.bidder.avatar_url} alt="" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-xs font-bold text-white border-2 border-border-dark">
+                          {(bid.bidder?.name || 'U')[0]}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-semibold text-white truncate">{bid.bidder?.name || 'Anonymous'}</span>
+                          {i === 0 && (
+                            <span className="text-[8px] font-black uppercase bg-primary/20 text-primary px-1.5 py-0.5 rounded-full tracking-wider">
+                              {isEnded ? 'Winner' : 'Highest'}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-500">{formatBidTime(bid.created_at)}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className={`font-bold text-sm tabular-nums ${i === 0 ? 'text-primary' : 'text-slate-400'}`}>
+                          ${Number(bid.amount).toFixed(2)}
+                        </span>
+                        {increase > 0 && (
+                          <p className="text-[10px] text-emerald-400 font-bold">+${increase.toFixed(2)}</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
         {/* End Auction Button (for owner only) */}
         {!isEnded && user?.id === item.seller_id && (
