@@ -235,7 +235,12 @@ const AppContent: React.FC = () => {
     }
 
     const isDemo = selectedItem.id.startsWith('demo-');
-    const conv = await createConversation(isDemo ? null : selectedItem.id, profile.id, sellerId);
+    const itemContext = {
+      title: selectedItem.title,
+      price: `$${selectedItem.price}`,
+      image: selectedItem.images?.[0],
+    };
+    const conv = await createConversation(isDemo ? null : selectedItem.id, profile.id, sellerId, itemContext);
 
     if (conv) {
       setSelectedConversationId(conv.id);

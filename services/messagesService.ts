@@ -100,20 +100,21 @@ export const sendMessage = async (
 export const createConversation = async (
     itemId: string | null,
     buyerId: string,
-    sellerId: string
+    sellerId: string,
+    initialItemContext?: { title: string; price: string; image?: string }
 ): Promise<Conversation | null> => {
-    // Check if conversation already exists between these two users (with or without item)
-    let existingQuery = supabase
+    // Check if conversation already exists between these two users in EITHER direction
+    const { data: existingList } = await supabase
         .from('conversations')
         .select('*')
-        .eq('buyer_id', buyerId)
-        .eq('seller_id', sellerId);
+        .or(
+            `and(buyer_id.eq.${buyerId},seller_id.eq.${sellerId}),and(buyer_id.eq.${sellerId},seller_id.eq.${buyerId})`
+        );
 
-    if (itemId) existingQuery = existingQuery.eq('item_id', itemId);
-    else existingQuery = existingQuery.is('item_id', null);
-
-    const { data: existing } = await existingQuery.maybeSingle();
-    if (existing) return existing as Conversation;
+    if (existingList && existingList.length > 0) {
+        // Return the existing conversation (prefer one with item if available)
+        return existingList[0] as Conversation;
+    }
 
     const insertPayload: any = { buyer_id: buyerId, seller_id: sellerId };
     if (itemId) insertPayload.item_id = itemId;
@@ -127,6 +128,17 @@ export const createConversation = async (
     if (error) {
         console.error('Error creating conversation:', error);
         return null;
+    }
+
+    // Send an auto item-context message so the seller knows what item is being discussed
+    if (data && initialItemContext) {
+        const contextText = `💬 Interested in: ${initialItemContext.title} (${initialItemContext.price})`;
+        await sendMessage(data.id, buyerId, contextText, 'alert', {
+            type: 'item_context',
+            title: initialItemContext.title,
+            price: initialItemContext.price,
+            image: initialItemContext.image,
+        });
     }
 
     return data as Conversation;
