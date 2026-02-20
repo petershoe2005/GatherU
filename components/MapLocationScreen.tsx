@@ -111,20 +111,36 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
   }, [customPin, isLoaded]);
 
   const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
-    return new Promise((resolve) => {
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status === 'OK' && results && results[0]) {
-          const components = results[0].address_components;
-          const neighborhood = components.find(c => c.types.includes('neighborhood'))?.long_name;
-          const locality = components.find(c => c.types.includes('locality'))?.long_name;
-          const sublocality = components.find(c => c.types.includes('sublocality'))?.long_name;
-          resolve(neighborhood || sublocality || locality || results[0].formatted_address.split(',')[0]);
-        } else {
-          resolve('Pinned Location');
-        }
+    // Try Google Geocoder first
+    try {
+      const result = await new Promise<string | null>((resolve) => {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+          if (status === 'OK' && results && results[0]) {
+            const components = results[0].address_components;
+            const neighborhood = components.find(c => c.types.includes('neighborhood'))?.long_name;
+            const locality = components.find(c => c.types.includes('locality'))?.long_name;
+            const sublocality = components.find(c => c.types.includes('sublocality'))?.long_name;
+            resolve(neighborhood || sublocality || locality || results[0].formatted_address.split(',')[0]);
+          } else {
+            resolve(null);
+          }
+        });
       });
-    });
+      if (result) return result;
+    } catch { /* fall through to Nominatim */ }
+
+    // Fallback: free OpenStreetMap Nominatim
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+      if (res.ok) {
+        const data = await res.json();
+        const addr = data?.address;
+        return addr?.neighbourhood || addr?.suburb || addr?.city || addr?.town || addr?.village || data?.display_name?.split(',')[0] || 'Current Location';
+      }
+    } catch { /* ignore */ }
+
+    return 'Current Location';
   };
 
   const handleMapClick = async (e: google.maps.MapMouseEvent) => {
@@ -297,11 +313,10 @@ const MapLocationScreen: React.FC<MapLocationScreenProps> = ({ currentLocation, 
             <button
               key={loc.name}
               onClick={() => selectCampusLocation(loc)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all whitespace-nowrap ${
-                selectedLoc.name === loc.name
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all whitespace-nowrap ${selectedLoc.name === loc.name
                   ? 'bg-primary text-slate-900 border-primary shadow-md'
                   : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 shadow-sm'
-              }`}
+                }`}
             >
               {loc.name}
             </button>
