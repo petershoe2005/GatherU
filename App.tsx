@@ -31,19 +31,24 @@ import CheckoutScreen from './components/CheckoutScreen';
 import UserProfileScreen from './components/UserProfileScreen';
 
 const AppContent: React.FC = () => {
-  const { session, profile, loading } = useAuth();
+  const { session, profile, loading, updateProfile } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.LANDING);
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [selectedDistance, setSelectedDistance] = useState(5);
-  const [userLocation, setUserLocation] = useState<AppLocation>({ name: 'Palo Alto', lat: 37.4419, lng: -122.1430 });
+  const [userLocation, setUserLocation] = useState<AppLocation>({ name: 'Detecting...', lat: 37.4419, lng: -122.1430 });
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [checkoutItem, setCheckoutItem] = useState<Item | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Request location on mount
   useEffect(() => {
+    // If user already has a saved location in their profile, use it
+    if (profile?.location && profile.location !== 'Palo Alto') {
+      setUserLocation(prev => ({ ...prev, name: profile.location }));
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -62,9 +67,13 @@ const AppContent: React.FC = () => {
               lat: latitude,
               lng: longitude
             });
+
+            // Save to profile so it persists in Supabase
+            if (profile && (!profile.location || profile.location === 'Palo Alto' || profile.location === 'Detecting...')) {
+              updateProfile({ location: cityName }).catch(console.error);
+            }
           } catch (error) {
             console.error('Error reverse geocoding:', error);
-            // Fallback to coordinates with generic name if fetch fails
             setUserLocation({
               name: 'Current Location',
               lat: latitude,
@@ -74,10 +83,14 @@ const AppContent: React.FC = () => {
         },
         (error) => {
           console.log('Location permission denied or error:', error);
+          // Fall back to profile location or default
+          if (profile?.location) {
+            setUserLocation(prev => ({ ...prev, name: profile.location }));
+          }
         }
       );
     }
-  }, []);
+  }, [profile?.id]);
 
   // Hash router: sync URL → screen
   useEffect(() => {
