@@ -9,6 +9,7 @@ export interface AuthContextType {
     loading: boolean;
     signInWithOtp: (email: string) => Promise<{ error: any }>;
     verifyOtp: (email: string, token: string) => Promise<{ error: any }>;
+    signInWithGoogle: () => Promise<{ error: any }>;
     signOut: () => Promise<void>;
     updateProfile: (data: Partial<Profile>) => Promise<{ error: any }>;
     updatePassword: (password: string) => Promise<{ error: any }>;
