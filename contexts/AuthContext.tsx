@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
+import { getSchoolNameFromEmail } from '../lib/universityUtils';
 import { Profile } from '../types';
 import { AuthContext } from './AuthContextDef';
 
@@ -27,6 +28,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 .map(part => part.charAt(0).toUpperCase() + part.slice(1))
                 .join(' ');
             const isEdu = email.toLowerCase().endsWith('.edu');
+            const schoolName = getSchoolNameFromEmail(email);
 
             return {
                 id: userId,
@@ -34,7 +36,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 name: derivedName,
                 username: emailPrefix,
                 is_verified: isEdu,
-                institution: isEdu ? (email.split('@')[1]?.replace('.edu', '').toUpperCase() || '') : '',
+                institution: isEdu ? (schoolName !== 'University' ? schoolName : (email.split('@')[1]?.replace('.edu', '').toUpperCase() || '')) : '',
             };
         };
 
