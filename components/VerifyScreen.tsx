@@ -156,20 +156,6 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onLogin }) => {
             </div>
 
             <button
-              onClick={() => handleSelectRole('student')}
-              className="w-full bg-surface-dark border-2 border-emerald-500/30 hover:border-emerald-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all active:scale-[0.98] group"
-            >
-              <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
-                <span className="material-icons text-emerald-400 text-2xl">school</span>
-              </div>
-              <div className="flex-1 text-left">
-                <h3 className="font-bold text-base text-white">I'm a Student</h3>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">Sign up with your .edu email and get a <span className="text-emerald-400 font-semibold">verified badge</span></p>
-              </div>
-              <span className="material-icons text-slate-600 group-hover:text-emerald-400 transition-colors">arrow_forward_ios</span>
-            </button>
-
-            <button
               onClick={() => handleSelectRole('local')}
               className="w-full bg-surface-dark border-2 border-blue-500/30 hover:border-blue-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all active:scale-[0.98] group"
             >
