@@ -152,12 +152,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const signOut = async () => {
-        setLoading(true);
-        await supabase.auth.signOut().catch(console.error);
+        // Clear local state immediately for instant UI response
         setSession(null);
         setUser(null);
         setProfile(null);
-        setLoading(false);
+        // Revoke server session in the background — don't block the UI
+        supabase.auth.signOut().catch(console.error);
     };
 
     const updateProfile = async (data: Partial<Profile>) => {
