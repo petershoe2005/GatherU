@@ -99,10 +99,8 @@ const AppContent: React.FC = () => {
       } else if (screen === AppScreen.VERIFY) {
         setCurrentScreen(AppScreen.VERIFY);
       } else {
-        // Default to LANDING for unauth users
-        setCurrentScreen(AppScreen.LANDING);
-        // Don't push route here to keep URL clean, or push it if needed
-        if (screen !== AppScreen.LANDING) pushRoute(AppScreen.LANDING);
+        setCurrentScreen(AppScreen.LOGIN);
+        pushRoute(AppScreen.LOGIN);
       }
     } else if (profile && !profile.name) {
       setCurrentScreen(AppScreen.SETUP_PROFILE);

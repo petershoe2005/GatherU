@@ -83,16 +83,9 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onLogin }) => {
     <div className="flex-1 flex flex-col items-center justify-center p-6 bg-background-dark text-white overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
 
-      {/* Icon */}
-      <div className="relative w-28 h-28 mb-8 transition-transform duration-700 hover:scale-110">
-        <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="relative flex items-center justify-center w-full h-full bg-slate-900 border border-primary/30 rounded-full shadow-2xl">
-          <span className="material-icons text-primary text-4xl">
-            {stage === 'role' ? 'group_add' : stage === 'email'
-              ? (role === 'student' ? 'school' : 'person')
-              : 'mark_email_unread'}
-          </span>
-        </div>
+      {/* Logo */}
+      <div className="w-40 h-40 mb-6 rounded-full border-2 border-primary/40 bg-slate-900/60 flex items-center justify-center">
+        <img src="/logo.png" alt="GatherU" className="w-36 h-36 object-contain" style={{ mixBlendMode: 'screen' }} />
       </div>
 
       {/* Title */}
@@ -103,7 +96,7 @@ const VerifyScreen: React.FC<VerifyScreenProps> = ({ onVerify, onLogin }) => {
             : 'Check Your Inbox'}
         </h1>
         <p className="text-slate-400 text-sm leading-relaxed px-4 max-w-xs mx-auto">
-          {stage === 'role' && 'Choose how you want to join the campus marketplace.'}
+          {stage === 'role' && 'Choose your role in the campus community.'}
           {stage === 'email' && role === 'student' && 'Enter your .edu email to get verified student status.'}
           {stage === 'email' && role === 'local' && 'Enter your email to join as a local member.'}
           {stage === 'code' && `We sent a 6-digit code to ${email}. Enter it below.`}

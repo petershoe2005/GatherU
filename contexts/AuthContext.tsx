@@ -112,7 +112,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (_event, s) => {
+            async (event, s) => {
+                // During manual signOut, loading is true and we handle state ourselves
+                if (event === 'SIGNED_OUT') return;
                 setSession(s);
                 setUser(s?.user ?? null);
                 if (s?.user) {
@@ -150,12 +152,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const signOut = async () => {
-        // Clear local state immediately for instant UI response
+        setLoading(true);
+        await supabase.auth.signOut().catch(console.error);
         setSession(null);
         setUser(null);
         setProfile(null);
-        // Fire Supabase sign-out in background
-        supabase.auth.signOut().catch(console.error);
+        setLoading(false);
     };
 
     const updateProfile = async (data: Partial<Profile>) => {

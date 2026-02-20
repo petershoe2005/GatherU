@@ -35,17 +35,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onBack }) => 
         <div className="flex-1 flex flex-col items-center justify-center p-6 bg-background-dark text-white overflow-hidden font-display">
             <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
 
-            <div className="relative w-24 h-24 mb-8">
-                <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse"></div>
-                <div className="relative flex items-center justify-center w-full h-full bg-slate-900 border border-primary/30 rounded-full shadow-2xl">
-                    <span className="material-icons text-primary text-4xl">lock_open</span>
-                </div>
+            <div className="w-40 h-40 mb-6 rounded-full border-2 border-primary/40 bg-slate-900/60 flex items-center justify-center">
+                <img src="/logo.png" alt="GatherU" className="w-36 h-36 object-contain" style={{ mixBlendMode: 'screen' }} />
             </div>
 
             <div className="text-center mb-8 relative z-10">
                 <h1 className="text-2xl font-black tracking-tight mb-2 uppercase">Welcome Back</h1>
                 <p className="text-slate-400 text-sm leading-relaxed px-4 max-w-xs mx-auto">
-                    Sign in to continue to campus marketplace.
+                    Sign in to access your campus marketplace.
                 </p>
             </div>
 
