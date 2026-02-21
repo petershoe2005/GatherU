@@ -107,19 +107,7 @@ export const deleteItem = async (id: string): Promise<boolean> => {
 
 export const incrementViewCount = async (id: string): Promise<void> => {
     if (id.startsWith('demo-')) return;
-    // Fetch current count and increment
-    const { data } = await supabase
-        .from('items')
-        .select('view_count')
-        .eq('id', id)
-        .maybeSingle();
-
-    if (data) {
-        await supabase
-            .from('items')
-            .update({ view_count: (data.view_count || 0) + 1 })
-            .eq('id', id);
-    }
+    await supabase.rpc('increment_view_count', { item_id: id });
 };
 
 export const endBidding = async (id: string): Promise<boolean> => {

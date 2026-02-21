@@ -94,17 +94,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 console.warn('Supabase connection timed out — proceeding without session');
                 setLoading(false);
             }
-        }, 15000);
+        }, 5000);
 
         supabase.auth.getSession()
             .then(({ data: { session: s } }) => {
                 clearTimeout(timeout);
                 setSession(s);
                 setUser(s?.user ?? null);
+                setLoading(false); // unblock UI immediately
                 if (s?.user) {
-                    fetchProfile(s.user.id).finally(() => setLoading(false));
-                } else {
-                    setLoading(false);
+                    fetchProfile(s.user.id); // load profile in background
                 }
             })
             .catch((err) => {
