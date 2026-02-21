@@ -7,7 +7,11 @@ const getAI = () => {
   if (!ai && process.env.API_KEY) {
     ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   }
-  return new GoogleGenAI({ apiKey: process.env.API_KEY || "AIzaSyDiYKf-wOQL1KV9I8uOhW43XQqHb8thKjs" });
+  if (!process.env.API_KEY) {
+    console.warn('Gemini API key not configured. Set GEMINI_API_KEY in .env.local');
+    return null;
+  }
+  return ai;
 };
 
 export const getSmartDescription = async (itemTitle: string) => {
