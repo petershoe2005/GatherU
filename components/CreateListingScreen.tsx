@@ -95,13 +95,15 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       // Location unavailable — item will only show for same-school users
     }
 
-    const newItem = await createItem(itemData);
-    setIsPublishing(false);
-
-    if (newItem) {
-      onPublish(newItem);
-    }
-  };
+      try {
+        const newItem = await createItem(itemData);
+        if (newItem) onPublish(newItem);
+      } catch (err) {
+        console.error('Failed to publish listing:', err);
+      } finally {
+        setIsPublishing(false);
+      }
+    };
 
   const isValid = title && (
     (category === 'housing' && buyNowPrice && leaseStart && leaseEnd) ||
@@ -458,7 +460,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 </p>
               </div>
             )}
-        </section>
+          </section>
       </form>
 
       <footer className="p-4 bg-white border-t border-slate-200">
