@@ -3,14 +3,10 @@ import { GoogleGenAI } from "@google/genai";
 
 let ai: GoogleGenAI | null = null;
 
-const getAI = () => {
-  if (!ai && process.env.API_KEY) {
-    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  }
-  if (!process.env.API_KEY) {
-    console.warn('Gemini API key not configured. Set GEMINI_API_KEY in .env.local');
-    return null;
-  }
+const getAI = (): GoogleGenAI | null => {
+  const key = process.env.API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
+  if (!key) return null;
+  if (!ai) ai = new GoogleGenAI({ apiKey: key });
   return ai;
 };
 
