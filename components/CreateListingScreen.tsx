@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Item } from '../types';
+import { Item, DraftItem } from '../types';
 import { useAuth } from '../contexts/useAuth';
 import { createItem } from '../services/itemsService';
 import ImageUploader from './ImageUploader';
@@ -8,32 +8,99 @@ import ImageUploader from './ImageUploader';
 interface CreateListingScreenProps {
   onBack: () => void;
   onPublish: (itemData: Partial<Item>) => void;
+  initialDraft?: DraftItem;
 }
 
-const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPublish }) => {
+const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPublish, initialDraft }) => {
 
   const { user } = useAuth();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [startingBid, setStartingBid] = useState('');
-  const [buyNowPrice, setBuyNowPrice] = useState('');
-  const [category, setCategory] = useState('tech');
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('cash');
-  const [listingType, setListingType] = useState<'auction' | 'fixed' | 'both'>('auction');
-  const [bidIncrement, setBidIncrement] = useState('1');
+  const [title, setTitle] = useState(initialDraft?.title || '');
+  const [description, setDescription] = useState(initialDraft?.description || '');
+  const [startingBid, setStartingBid] = useState(initialDraft?.startingBid || '');
+  const [buyNowPrice, setBuyNowPrice] = useState(initialDraft?.buyNowPrice || '');
+  const [category, setCategory] = useState(initialDraft?.category || 'tech');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>(initialDraft?.paymentMethod || 'cash');
+  const [listingType, setListingType] = useState<'auction' | 'fixed' | 'both'>(initialDraft?.listingType || 'auction');
+  const [bidIncrement, setBidIncrement] = useState(initialDraft?.bidIncrement || '1');
   const [isPublishing, setIsPublishing] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [depositPercentage, setDepositPercentage] = useState(10);
-  const [showNearby, setShowNearby] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<string[]>(initialDraft?.uploadedImages || []);
+  const [depositPercentage, setDepositPercentage] = useState(initialDraft?.depositPercentage || 10);
+  const [showNearby, setShowNearby] = useState(initialDraft?.showNearby ?? false);
 
   // Housing specific state
-  const [housingType, setHousingType] = useState<'apartment' | 'room' | 'sublet' | 'house'>('sublet');
-  const [rentPeriod, setRentPeriod] = useState<'month' | 'semester' | 'year' | 'total'>('month');
-  const [leaseStart, setLeaseStart] = useState('');
-  const [leaseEnd, setLeaseEnd] = useState('');
-  const [isFurnished, setIsFurnished] = useState(false);
-  const [utilitiesIncluded, setUtilitiesIncluded] = useState(false);
-  const [sqft, setSqft] = useState('');
+  const [housingType, setHousingType] = useState<'apartment' | 'room' | 'sublet' | 'house'>(initialDraft?.housingType || 'sublet');
+  const [rentPeriod, setRentPeriod] = useState<'month' | 'semester' | 'year' | 'total'>(initialDraft?.rentPeriod || 'month');
+  const [leaseStart, setLeaseStart] = useState(initialDraft?.leaseStart || '');
+  const [leaseEnd, setLeaseEnd] = useState(initialDraft?.leaseEnd || '');
+  const [isFurnished, setIsFurnished] = useState(initialDraft?.isFurnished ?? false);
+  const [utilitiesIncluded, setUtilitiesIncluded] = useState(initialDraft?.utilitiesIncluded ?? false);
+  const [sqft, setSqft] = useState(initialDraft?.sqft || '');
+
+  // Keep state in sync with initialDraft prop if it changes
+  React.useEffect(() => {
+    setTitle(initialDraft?.title || '');
+    setDescription(initialDraft?.description || '');
+    setStartingBid(initialDraft?.startingBid || '');
+    setBuyNowPrice(initialDraft?.buyNowPrice || '');
+    setCategory(initialDraft?.category || 'tech');
+    setPaymentMethod(initialDraft?.paymentMethod || 'cash');
+    setListingType(initialDraft?.listingType || 'auction');
+    setBidIncrement(initialDraft?.bidIncrement || '1');
+    setUploadedImages(initialDraft?.uploadedImages || []);
+    setDepositPercentage(initialDraft?.depositPercentage || 10);
+    setShowNearby(initialDraft?.showNearby ?? false);
+    setHousingType(initialDraft?.housingType || 'sublet');
+    setRentPeriod(initialDraft?.rentPeriod || 'month');
+    setLeaseStart(initialDraft?.leaseStart || '');
+    setLeaseEnd(initialDraft?.leaseEnd || '');
+    setIsFurnished(initialDraft?.isFurnished ?? false);
+    setUtilitiesIncluded(initialDraft?.utilitiesIncluded ?? false);
+    setSqft(initialDraft?.sqft || '');
+  }, [initialDraft]);
+
+  const draftId = initialDraft?.draftId || `draft_${crypto.randomUUID ? crypto.randomUUID() : Date.now()}`;
+
+  const handleSaveDraft = () => {
+    const draftData: DraftItem = {
+      draftId,
+      updatedAt: new Date().toISOString(),
+      title,
+      description,
+      category,
+      listingType,
+      paymentMethod,
+      startingBid,
+      buyNowPrice,
+      bidIncrement,
+      depositPercentage,
+      showNearby,
+      uploadedImages,
+      housingType,
+      rentPeriod,
+      leaseStart,
+      leaseEnd,
+      isFurnished,
+      utilitiesIncluded,
+      sqft
+    };
+
+    const existingDraftsRaw = localStorage.getItem('gatheru_drafts');
+    let drafts: DraftItem[] = [];
+    if (existingDraftsRaw) {
+      try {
+        drafts = JSON.parse(existingDraftsRaw);
+      } catch (e) {
+        console.error("Failed to parse drafts", e);
+      }
+    }
+
+    // Filter out the old version of this draft if it exists, then unshift the new one
+    drafts = drafts.filter(d => d.draftId !== draftId);
+    drafts.unshift(draftData);
+
+    localStorage.setItem('gatheru_drafts', JSON.stringify(drafts));
+    onBack();
+  };
 
   const handlePublish = async () => {
     if (!title || !user) return;
@@ -103,6 +170,16 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
     try {
       const newItem = await createItem(itemData);
       if (newItem) {
+        // Remove draft upon successful creation
+        if (initialDraft?.draftId) {
+          const rawDrafts = localStorage.getItem('gatheru_drafts');
+          if (rawDrafts) {
+            try {
+              const drafts = JSON.parse(rawDrafts).filter((d: DraftItem) => d.draftId !== initialDraft.draftId);
+              localStorage.setItem('gatheru_drafts', JSON.stringify(drafts));
+            } catch (e) { }
+          }
+        }
         onPublish(newItem);
       }
     } catch (e) {
@@ -126,7 +203,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-slate-200">
         <button type="button" onClick={onBack} className="text-secondary font-medium text-sm">Cancel</button>
         <h1 className="text-lg font-bold text-secondary">New Listing</h1>
-        <button type="button" onClick={onBack} className="text-primary font-bold text-sm">Save Draft</button>
+        <button type="button" onClick={handleSaveDraft} className="text-primary font-bold text-sm">Save Draft</button>
       </header>
 
       <form className="flex-1 overflow-y-auto pb-32">

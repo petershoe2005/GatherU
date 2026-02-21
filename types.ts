@@ -95,6 +95,30 @@ export interface Item {
   boost_expires_at?: string | null;
 }
 
+export interface DraftItem {
+  draftId: string;
+  updatedAt: string;
+  title: string;
+  description: string;
+  category: string;
+  listingType: 'auction' | 'fixed' | 'both';
+  paymentMethod: 'cash' | 'online';
+  startingBid: string;
+  buyNowPrice: string;
+  bidIncrement: string;
+  depositPercentage: number;
+  showNearby: boolean;
+  uploadedImages: string[];
+  // Housing specific
+  housingType: 'apartment' | 'room' | 'sublet' | 'house';
+  rentPeriod: 'month' | 'semester' | 'year' | 'total';
+  leaseStart: string;
+  leaseEnd: string;
+  isFurnished: boolean;
+  utilitiesIncluded: boolean;
+  sqft: string;
+}
+
 export interface Category {
   id: string;
   name: string;

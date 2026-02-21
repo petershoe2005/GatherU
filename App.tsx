@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppScreen, Item, profileToUser, AppLocation } from './types';
+import { Item, Category, AppScreen, DraftItem, profileToUser, AppLocation } from './types';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/useAuth';
 import { fetchItems, subscribeToItems } from './services/itemsService';
@@ -39,6 +39,7 @@ const AppContent: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [selectedDistance, setSelectedDistance] = useState(5);
   const [userLocation, setUserLocation] = useState<AppLocation>({ name: 'Detecting...', lat: 37.4419, lng: -122.1430 });
+  const [activeDraft, setActiveDraft] = useState<DraftItem | undefined>(undefined);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [checkoutItem, setCheckoutItem] = useState<Item | null>(null);
   const [depositItem, setDepositItem] = useState<Item | null>(null);
@@ -331,7 +332,19 @@ const AppContent: React.FC = () => {
           />
         ) : null;
       case AppScreen.CREATE:
-        return <CreateListingScreen onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }} onPublish={handlePublishListing} />;
+        return (
+          <CreateListingScreen
+            onBack={() => {
+              setActiveDraft(undefined);
+              navigate(AppScreen.FEED);
+            }}
+            onPublish={async (itemData) => {
+              setActiveDraft(undefined);
+              await handlePublishListing();
+            }}
+            initialDraft={activeDraft}
+          />
+        );
       case AppScreen.BIDS:
         return <BidsScreen items={items} onNavigate={navigate} />;
       case AppScreen.MESSAGES:
@@ -343,7 +356,14 @@ const AppContent: React.FC = () => {
           <MyListingsScreen
             onBack={() => navigate(AppScreen.PROFILE)}
             onSelectItem={(item) => navigate(AppScreen.DETAILS, item)}
-            onAddListing={() => navigate(AppScreen.CREATE)}
+            onAddListing={() => {
+              setActiveDraft(undefined);
+              navigate(AppScreen.CREATE);
+            }}
+            onEditDraft={(draft) => {
+              setActiveDraft(draft);
+              navigate(AppScreen.CREATE);
+            }}
           />
         );
       case AppScreen.PURCHASE_HISTORY:

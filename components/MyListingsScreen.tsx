@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Item } from '../types';
+import { Item, DraftItem } from '../types';
 import { useAuth } from '../contexts/useAuth';
 import { fetchMyListings } from '../services/itemsService';
 import { supabase } from '../lib/supabase';
@@ -10,21 +10,31 @@ interface MyListingsScreenProps {
   onBack: () => void;
   onSelectItem: (item: Item) => void;
   onAddListing: () => void;
+  onEditDraft: (draft: DraftItem) => void;
 }
 
-type TabType = 'Active' | 'Pending' | 'Sold';
+type TabType = 'Active' | 'Pending' | 'Sold' | 'Drafts';
 
-const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectItem, onAddListing }) => {
+const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectItem, onAddListing, onEditDraft }) => {
   const { user } = useAuth();
   const [items, setItems] = useState<Item[]>([]);
+  const [drafts, setDrafts] = useState<DraftItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('Active');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [boostingItem, setBoostingItem] = useState<Item | null>(null);
 
+  const loadDrafts = () => {
+    try {
+      const raw = localStorage.getItem('gatheru_drafts');
+      if (raw) setDrafts(JSON.parse(raw));
+    } catch (e) { }
+  };
+
   useEffect(() => {
     const load = async () => {
       if (!user) return;
+      loadDrafts();
       const data = await fetchMyListings(user.id);
       setItems(data);
       setLoading(false);
@@ -56,6 +66,18 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
     setConfirmingId(null);
   };
 
+  const handleDeleteDraft = (e: React.MouseEvent, draftId: string) => {
+    e.stopPropagation();
+    try {
+      const existingRaw = localStorage.getItem('gatheru_drafts');
+      if (existingRaw) {
+        let updated = JSON.parse(existingRaw).filter((d: DraftItem) => d.draftId !== draftId);
+        localStorage.setItem('gatheru_drafts', JSON.stringify(updated));
+        setDrafts(updated);
+      }
+    } catch (e) { }
+  };
+
   const getStatusBadge = (item: Item) => {
     if (activeTab === 'Active') {
       return <div className="absolute top-1 left-1 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight">Live</div>;
@@ -76,6 +98,7 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
     { key: 'Active', label: 'Active', count: activeItems.length },
     { key: 'Pending', label: 'Pending', count: pendingItems.length },
     { key: 'Sold', label: 'Sold', count: soldItems.length },
+    { key: 'Drafts', label: 'Drafts', count: drafts.length },
   ];
 
   return (
@@ -123,13 +146,13 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
             <div className="flex justify-center py-20">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : displayItems.length === 0 ? (
+          ) : (activeTab === 'Drafts' ? drafts.length === 0 : displayItems.length === 0) ? (
             <div className="py-20 text-center opacity-30">
               <span className="material-icons text-5xl mb-3">
                 {activeTab === 'Active' ? 'inventory_2' : activeTab === 'Pending' ? 'local_shipping' : 'sell'}
               </span>
               <p className="text-sm font-bold uppercase tracking-widest">
-                {activeTab === 'Active' ? 'No active listings' : activeTab === 'Pending' ? 'No pending deliveries' : 'No sold items yet'}
+                {activeTab === 'Active' ? 'No active listings' : activeTab === 'Pending' ? 'No pending deliveries' : activeTab === 'Drafts' ? 'No saved drafts' : 'No sold items yet'}
               </p>
               {activeTab === 'Pending' && (
                 <p className="text-[11px] text-slate-500 mt-2 max-w-[200px] mx-auto">
@@ -137,6 +160,51 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
                 </p>
               )}
             </div>
+          ) : activeTab === 'Drafts' ? (
+            drafts.map(draft => (
+              <div key={draft.draftId} className="bg-surface-dark border border-border-dark p-4 rounded-2xl overflow-hidden shadow-sm">
+                <div className="flex gap-4 cursor-pointer" onClick={() => onEditDraft(draft)}>
+                  <div className="relative w-24 h-24 shrink-0">
+                    <img
+                      alt={draft.title || 'Untitled'}
+                      className="w-full h-full object-cover rounded-xl bg-slate-700"
+                      src={draft.uploadedImages?.[0] || 'https://via.placeholder.com/96x96?text=No+Image'}
+                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/96x96?text=No+Image'; }}
+                    />
+                    <div className="absolute top-1 left-1 bg-slate-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight">Draft</div>
+                  </div>
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-semibold text-base leading-tight mb-1 truncate">{draft.title || 'Untitled Draft'}</h3>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xs text-slate-400">Category:</span>
+                        <span className="text-sm font-bold text-slate-200 capitalize">{draft.category}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-slate-400">
+                      <div className={`flex items-center gap-1 font-medium text-slate-500`}>
+                        <span className="material-icons-round text-sm">edit_document</span>
+                        <span>Saved {new Date(draft.updatedAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-border-dark flex gap-3">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEditDraft(draft); }}
+                    className="flex-1 bg-primary text-background-dark py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
+                  >
+                    <span className="material-icons-round text-sm">edit</span> Resume
+                  </button>
+                  <button
+                    onClick={(e) => handleDeleteDraft(e, draft.draftId)}
+                    className="flex-1 bg-slate-800 text-rose-400 border border-slate-700 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-700 hover:text-rose-500 transition-colors"
+                  >
+                    <span className="material-icons-round text-sm">delete</span> Delete
+                  </button>
+                </div>
+              </div>
+            ))
           ) : (
             displayItems.map(item => (
               <div key={item.id} className="bg-surface-dark border border-border-dark p-4 rounded-2xl overflow-hidden shadow-sm">
@@ -186,11 +254,10 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setBoostingItem(item); }}
-                        className={`px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-1 hover:opacity-90 transition-colors ${
-                          item.is_boosted
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            : 'bg-primary text-background-dark'
-                        }`}
+                        className={`px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-1 hover:opacity-90 transition-colors ${item.is_boosted
+                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          : 'bg-primary text-background-dark'
+                          }`}
                       >
                         <span className="material-icons-round text-sm">rocket_launch</span>
                         {item.is_boosted ? 'Boosted' : 'Boost'}
