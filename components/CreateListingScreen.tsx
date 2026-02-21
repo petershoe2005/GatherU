@@ -136,7 +136,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
 
         <section className="px-4 py-2 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Item Title</label>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Item Title <span className="text-red-500">*</span></label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -147,7 +147,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Category</label>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Category <span className="text-red-500">*</span></label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -280,7 +280,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
               <div className={`grid ${listingType === 'both' ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-4'}`}>
                 {(listingType === 'auction' || listingType === 'both') && (
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Starting Bid</label>
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Starting Bid <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                       <input
@@ -295,9 +295,9 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 )}
                 {(listingType === 'fixed' || listingType === 'both') && (
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
-                      {listingType === 'both' ? 'Buy Now Price' : 'Price'}
-                    </label>
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                        {listingType === 'both' ? 'Buy Now Price' : 'Price'} <span className="text-red-500">*</span>
+                      </label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                       <input
@@ -357,7 +357,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             </div>
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Rent Amount</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Rent Amount <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                   <input
