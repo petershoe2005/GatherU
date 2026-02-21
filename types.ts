@@ -90,6 +90,8 @@ export interface Item {
     latitude?: number | null;
     longitude?: number | null;
     deposit_percentage?: number;
+    is_boosted?: boolean;
+    boost_expires_at?: string | null;
   }
 
 export interface Category {
@@ -228,10 +230,12 @@ export function dbItemToItem(row: any, sellerProfile?: Profile): Item {
     is_furnished: row.is_furnished,
     utilities_included: row.utilities_included,
     sqft: row.sqft,
-    latitude: row.latitude ? Number(row.latitude) : null,
-    longitude: row.longitude ? Number(row.longitude) : null,
-    deposit_percentage: row.deposit_percentage || 10,
-  };
+      latitude: row.latitude ? Number(row.latitude) : null,
+      longitude: row.longitude ? Number(row.longitude) : null,
+      deposit_percentage: row.deposit_percentage || 10,
+      is_boosted: row.is_boosted || false,
+      boost_expires_at: row.boost_expires_at || null,
+    };
 }
 
 export interface AppLocation {

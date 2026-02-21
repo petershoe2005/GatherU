@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/useAuth';
 import { placeBid } from '../services/bidsService';
 import { fetchBidsForItem, subscribeToBids } from '../services/bidsService';
 import { incrementViewCount } from '../services/itemsService';
+import { recordItemView } from '../services/feedAlgorithm';
 import { isFavorited, addFavorite, removeFavorite } from '../services/favoritesService';
 import { fetchReviewsForSeller, submitReview, hasUserReviewed, Review } from '../services/reviewsService';
 import ReviewModal from './ReviewModal';
@@ -101,6 +102,10 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
     if (item.id && !viewCountedRef.current) {
       viewCountedRef.current = true;
       incrementViewCount(item.id);
+      // Record interest for personalisation
+      if (user?.id) {
+        recordItemView(user.id, item);
+      }
     }
   }, [item.id]);
 
@@ -139,6 +144,12 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
       setBidAmount(bid.amount + 5);
       setShowBidSuccess(true);
       setTimeout(() => setShowBidSuccess(false), 3000);
+      // Bids are a strong interest signal — score +3
+      if (user?.id) {
+        import('../services/feedAlgorithm').then(({ upsertInterest }) => {
+          upsertInterest(user.id, item.category, 3);
+        });
+      }
     }
     setIsBidding(false);
   };

@@ -4,6 +4,7 @@ import { Item } from '../types';
 import { useAuth } from '../contexts/useAuth';
 import { fetchMyListings } from '../services/itemsService';
 import { supabase } from '../lib/supabase';
+import BoostModal from './BoostModal';
 
 interface MyListingsScreenProps {
   onBack: () => void;
@@ -19,6 +20,7 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('Active');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [boostingItem, setBoostingItem] = useState<Item | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -45,8 +47,6 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
         .from('items')
         .update({ status: 'sold' })
         .eq('id', item.id);
-
-      // Update local state
       setItems(prev => prev.map(i =>
         i.id === item.id ? { ...i, status: 'sold' as const } : i
       ));
@@ -58,18 +58,12 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
 
   const getStatusBadge = (item: Item) => {
     if (activeTab === 'Active') {
-      return (
-        <div className="absolute top-1 left-1 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight">Live</div>
-      );
+      return <div className="absolute top-1 left-1 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight">Live</div>;
     }
     if (activeTab === 'Pending') {
-      return (
-        <div className="absolute top-1 left-1 bg-amber-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight">Pending</div>
-      );
+      return <div className="absolute top-1 left-1 bg-amber-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight">Pending</div>;
     }
-    return (
-      <div className="absolute top-1 left-1 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight">Sold</div>
-    );
+    return <div className="absolute top-1 left-1 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight">Sold</div>;
   };
 
   const getPriceLabel = () => {
@@ -148,12 +142,12 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
               <div key={item.id} className="bg-surface-dark border border-border-dark p-4 rounded-2xl overflow-hidden shadow-sm">
                 <div className="flex gap-4 cursor-pointer" onClick={() => onSelectItem(item)}>
                   <div className="relative w-24 h-24 shrink-0">
-                      <img
-                        alt={item.title}
-                        className="w-full h-full object-cover rounded-xl bg-slate-700"
-                        src={item.images?.[0] || 'https://via.placeholder.com/96x96?text=No+Image'}
-                        onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/96x96?text=No+Image'; }}
-                      />
+                    <img
+                      alt={item.title}
+                      className="w-full h-full object-cover rounded-xl bg-slate-700"
+                      src={item.images?.[0] || 'https://via.placeholder.com/96x96?text=No+Image'}
+                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/96x96?text=No+Image'; }}
+                    />
                     {getStatusBadge(item)}
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
@@ -190,8 +184,16 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
                       <button className="flex-1 bg-slate-800 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-slate-700 transition-colors">
                         <span className="material-icons-round text-sm">edit</span> Manage
                       </button>
-                      <button className="px-6 bg-primary text-background-dark py-2.5 rounded-xl text-sm font-bold flex items-center justify-center hover:bg-primary/90 transition-colors">
-                        Boost
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setBoostingItem(item); }}
+                        className={`px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-1 hover:opacity-90 transition-colors ${
+                          item.is_boosted
+                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            : 'bg-primary text-background-dark'
+                        }`}
+                      >
+                        <span className="material-icons-round text-sm">rocket_launch</span>
+                        {item.is_boosted ? 'Boosted' : 'Boost'}
                       </button>
                     </>
                   )}
@@ -232,6 +234,20 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
           )}
         </div>
       </main>
+
+      {/* Boost Modal */}
+      {boostingItem && user && (
+        <BoostModal
+          itemId={boostingItem.id}
+          itemTitle={boostingItem.title}
+          sellerId={user.id}
+          onClose={() => setBoostingItem(null)}
+          onSuccess={() => {
+            setBoostingItem(null);
+            fetchMyListings(user.id).then(setItems);
+          }}
+        />
+      )}
     </div>
   );
 };
