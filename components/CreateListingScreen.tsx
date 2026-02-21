@@ -63,18 +63,17 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       ? parseFloat(buyNowPrice)
       : parseFloat(startingBid);
 
-      const itemData: any = {
-        seller_id: user.id,
-        title,
-        description,
-        category: category.toLowerCase(),
-        starting_price: startPrice,
-        images: uploadedImages.length > 0 ? uploadedImages : ['https://picsum.photos/seed/' + title.replace(/\s/g, '-') + '/400/300'],
-        payment_method: paymentMethod,
-        listing_type: category === 'housing' ? 'fixed' : listingType,
-          deposit_percentage: paymentMethod === 'online' ? depositPercentage : 10,
-          show_nearby: showNearby,
-      };
+    const itemData: any = {
+      seller_id: user.id,
+      title,
+      description,
+      category: category.toLowerCase(),
+      starting_price: startPrice,
+      images: uploadedImages.length > 0 ? uploadedImages : ["https://picsum.photos/seed/" + title.replace(/\s/g, "-") + "/400/300"],
+      payment_method: paymentMethod,
+      listing_type: category === "housing" ? "fixed" : listingType,
+      deposit_percentage: paymentMethod === "online" ? depositPercentage : 10,
+    };
 
     if (category === 'housing') {
       itemData.housing_type = housingType;
