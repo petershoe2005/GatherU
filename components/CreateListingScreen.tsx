@@ -85,20 +85,30 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
 
     // Attach user's current location for radius-based feed filtering
     try {
-      const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 })
-      );
+      const pos = await Promise.race([
+        new Promise<GeolocationPosition>((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000, maximumAge: 10000 })
+        ),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Location timeout")), 5000)
+        )
+      ]);
       itemData.latitude = pos.coords.latitude;
       itemData.longitude = pos.coords.longitude;
     } catch {
-      // Location unavailable — item will only show for same-school users
+      // Location unavailable or timed out — item will only show for same-school users
+      console.log("Location fetch skipped or timed out");
     }
 
-    const newItem = await createItem(itemData);
-    setIsPublishing(false);
-
-    if (newItem) {
-      onPublish(newItem);
+    try {
+      const newItem = await createItem(itemData);
+      if (newItem) {
+        onPublish(newItem);
+      }
+    } catch (e) {
+      console.error("Failed to create item", e);
+    } finally {
+      setIsPublishing(false);
     }
   };
 
