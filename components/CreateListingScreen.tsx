@@ -124,9 +124,9 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
   return (
     <div className="flex-1 flex flex-col bg-slate-50">
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-slate-200">
-        <button onClick={onBack} className="text-secondary font-medium text-sm">Cancel</button>
+        <button type="button" onClick={onBack} className="text-secondary font-medium text-sm">Cancel</button>
         <h1 className="text-lg font-bold text-secondary">New Listing</h1>
-        <button className="text-primary font-bold text-sm">Save Draft</button>
+        <button type="button" onClick={onBack} className="text-primary font-bold text-sm">Save Draft</button>
       </header>
 
       <form className="flex-1 overflow-y-auto pb-32">
