@@ -9,6 +9,7 @@ import {
   buyerConfirmDelivery,
   rejectDelivery,
 } from '../services/ordersService';
+import { releaseEscrow } from '../services/escrowService';
 
 interface DeliveryConfirmationScreenProps {
   item: Item;
@@ -85,15 +86,16 @@ const DeliveryConfirmationScreen: React.FC<DeliveryConfirmationScreenProps> = ({
   };
 
   const handleBuyerConfirm = async () => {
-    if (!user) return;
-    setActionLoading(true);
-    const oid = await getOrCreateOrder();
-    if (oid) {
-      await buyerConfirmDelivery(oid);
-      setStep('rate');
-    }
-    setActionLoading(false);
-  };
+      if (!user) return;
+      setActionLoading(true);
+      const oid = await getOrCreateOrder();
+      if (oid) {
+        await buyerConfirmDelivery(oid);
+        await releaseEscrow(item.id);
+        setStep('rate');
+      }
+      setActionLoading(false);
+    };
 
   const handleReject = async () => {
     if (!user || !selectedReason) return;

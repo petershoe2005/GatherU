@@ -67,6 +67,7 @@ export const createItem = async (itemData: {
     allow_offers?: boolean;
     latitude?: number;
     longitude?: number;
+    deposit_percentage?: number;
 }): Promise<Item | null> => {
     const { data, error } = await supabase
         .from('items')

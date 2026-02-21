@@ -21,7 +21,8 @@ export enum AppScreen {
   NOTIFICATIONS = 'notifications',
   FAVORITES = 'favorites',
   CHECKOUT = 'checkout',
-  USER_PROFILE = 'user_profile'
+  USER_PROFILE = 'user_profile',
+  DEPOSIT_CHECKOUT = 'deposit_checkout'
 }
 
 
@@ -86,9 +87,10 @@ export interface Item {
   utilities_included?: boolean;
   sqft?: number;
   bid_increment?: number;
-  latitude?: number | null;
-  longitude?: number | null;
-}
+    latitude?: number | null;
+    longitude?: number | null;
+    deposit_percentage?: number;
+  }
 
 export interface Category {
   id: string;
@@ -164,14 +166,28 @@ export function profileToUser(profile: Profile): User {
 }
 
 export interface AppNotification {
+    id: string;
+    user_id: string;
+    type: 'bid' | 'outbid' | 'message' | 'sold' | 'order' | 'system' | 'review';
+    title: string;
+    body: string;
+    read: boolean;
+    data?: Record<string, any>;
+    created_at: string;
+  }
+
+export interface EscrowTransaction {
   id: string;
-  user_id: string;
-  type: 'bid' | 'outbid' | 'message' | 'sold' | 'order' | 'system' | 'review';
-  title: string;
-  body: string;
-  read: boolean;
-  data?: Record<string, any>;
+  item_id: string;
+  buyer_id: string;
+  seller_id: string;
+  payment_intent_id: string;
+  deposit_amount: number;
+  full_price: number;
+  deposit_percentage: number;
+  status: 'held' | 'released' | 'refunded' | 'forfeited';
   created_at: string;
+  updated_at: string;
 }
 
 // Helper to convert DB item row to frontend Item interface
@@ -214,6 +230,7 @@ export function dbItemToItem(row: any, sellerProfile?: Profile): Item {
     sqft: row.sqft,
     latitude: row.latitude ? Number(row.latitude) : null,
     longitude: row.longitude ? Number(row.longitude) : null,
+    deposit_percentage: row.deposit_percentage || 10,
   };
 }
 

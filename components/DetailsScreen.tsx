@@ -19,9 +19,10 @@ interface DetailsScreenProps {
   onBuyNow?: () => void;
   onMessageSeller?: () => void;
   onViewSellerProfile?: () => void;
+  onPayDeposit?: () => void;
 }
 
-const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDelivery, onViewLive, onEndBidding, onBuyNow, onMessageSeller, onViewSellerProfile }) => {
+const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDelivery, onViewLive, onEndBidding, onBuyNow, onMessageSeller, onViewSellerProfile, onPayDeposit }) => {
   const { user } = useAuth();
   const [currentBid, setCurrentBid] = useState(item.currentBid);
   const [isBidding, setIsBidding] = useState(false);
@@ -241,8 +242,14 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
 
             <div className="flex flex-wrap gap-2 items-center mt-2">
               <span className="px-3 py-1 bg-primary/10 text-primary text-[11px] font-bold rounded-full border border-primary/20">
-                {item.category === 'housing' ? (item.housing_type || 'Housing') : (item.category || 'General')}
-              </span>
+                  {item.category === 'housing' ? (item.housing_type || 'Housing') : (item.category || 'General')}
+                </span>
+                {item.payment_method === 'online' && item.deposit_percentage && (
+                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[11px] font-bold rounded-full border border-emerald-500/20 flex items-center gap-1">
+                    <span className="material-icons-round text-[11px]">account_balance</span>
+                    {item.deposit_percentage}% deposit
+                  </span>
+                )}
               <span className="flex items-center gap-1 text-xs text-slate-400">
                 <span className="material-icons-round text-sm">visibility</span>{item.viewCount} views
               </span>
@@ -413,24 +420,35 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
             Message Landlord
           </button>
         ) : isEnded ? (
-          <div className="flex gap-3">
-            <button
-              onClick={onConfirmDelivery}
-              className="flex-1 bg-primary hover:bg-primary/90 text-slate-900 font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-            >
-              <span className="material-icons-round text-sm">local_shipping</span>
-              Confirm Delivery
-            </button>
-            {!alreadyReviewed && (
-              <button
-                onClick={() => setShowReviewModal(true)}
-                className="bg-amber-500/10 text-amber-400 font-bold py-4 px-5 rounded-xl border border-amber-500/20 flex items-center justify-center gap-2"
-              >
-                <span className="material-icons-round text-sm">star</span>
-                Rate
-              </button>
-            )}
-          </div>
+            <div className="space-y-2">
+              {item.payment_method === 'online' && onPayDeposit && (
+                <button
+                  onClick={onPayDeposit}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-xl shadow-xl shadow-emerald-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <span className="material-icons-round text-sm">account_balance</span>
+                  Pay {item.deposit_percentage || 10}% Deposit — ${((item.currentBid * (item.deposit_percentage || 10)) / 100).toFixed(2)}
+                </button>
+              )}
+              <div className="flex gap-3">
+                <button
+                  onClick={onConfirmDelivery}
+                  className="flex-1 bg-primary hover:bg-primary/90 text-slate-900 font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                >
+                  <span className="material-icons-round text-sm">local_shipping</span>
+                  Confirm Delivery
+                </button>
+                {!alreadyReviewed && (
+                  <button
+                    onClick={() => setShowReviewModal(true)}
+                    className="bg-amber-500/10 text-amber-400 font-bold py-4 px-5 rounded-xl border border-amber-500/20 flex items-center justify-center gap-2"
+                  >
+                    <span className="material-icons-round text-sm">star</span>
+                    Rate
+                  </button>
+                )}
+              </div>
+            </div>
         ) : item.listing_type === 'fixed' ? (
           /* Fixed price only — Buy Now button */
           <button

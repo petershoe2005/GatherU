@@ -29,6 +29,7 @@ const SCREEN_ROUTES: Record<AppScreen, string> = {
     [AppScreen.FAVORITES]: '/favorites',
     [AppScreen.CHECKOUT]: '/checkout',
     [AppScreen.USER_PROFILE]: '/user',
+    [AppScreen.DEPOSIT_CHECKOUT]: '/deposit-checkout',
 };
 
 const ROUTE_TO_SCREEN = Object.fromEntries(

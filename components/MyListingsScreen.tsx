@@ -148,7 +148,12 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
               <div key={item.id} className="bg-surface-dark border border-border-dark p-4 rounded-2xl overflow-hidden shadow-sm">
                 <div className="flex gap-4 cursor-pointer" onClick={() => onSelectItem(item)}>
                   <div className="relative w-24 h-24 shrink-0">
-                    <img alt={item.title} className="w-full h-full object-cover rounded-xl" src={item.images[0]} />
+                      <img
+                        alt={item.title}
+                        className="w-full h-full object-cover rounded-xl bg-slate-700"
+                        src={item.images?.[0] || 'https://via.placeholder.com/96x96?text=No+Image'}
+                        onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/96x96?text=No+Image'; }}
+                      />
                     {getStatusBadge(item)}
                   </div>
                   <div className="flex-1 flex flex-col justify-between">

@@ -23,8 +23,9 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
   const [listingType, setListingType] = useState<'auction' | 'fixed' | 'both'>('auction');
   const [bidIncrement, setBidIncrement] = useState('1');
   const [isLoadingAi, setIsLoadingAi] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    const [depositPercentage, setDepositPercentage] = useState(10);
 
   // Housing specific state
   const [housingType, setHousingType] = useState<'apartment' | 'room' | 'sublet' | 'house'>('sublet');
@@ -61,16 +62,17 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       ? parseFloat(buyNowPrice)
       : parseFloat(startingBid);
 
-    const itemData: any = {
-      seller_id: user.id,
-      title,
-      description,
-      category: category.toLowerCase(),
-      starting_price: startPrice,
-      images: uploadedImages.length > 0 ? uploadedImages : ['https://picsum.photos/seed/' + title.replace(/\s/g, '-') + '/400/300'],
-      payment_method: paymentMethod,
-      listing_type: category === 'housing' ? 'fixed' : listingType,
-    };
+      const itemData: any = {
+        seller_id: user.id,
+        title,
+        description,
+        category: category.toLowerCase(),
+        starting_price: startPrice,
+        images: uploadedImages.length > 0 ? uploadedImages : ['https://picsum.photos/seed/' + title.replace(/\s/g, '-') + '/400/300'],
+        payment_method: paymentMethod,
+        listing_type: category === 'housing' ? 'fixed' : listingType,
+        deposit_percentage: paymentMethod === 'online' ? depositPercentage : 10,
+      };
 
     if (category === 'housing') {
       itemData.housing_type = housingType;
@@ -394,15 +396,53 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 <span className="text-xs font-black uppercase tracking-widest">Cash</span>
               </button>
               <button
-                className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === 'online' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 bg-white text-slate-500'}`}
-                type="button"
-                onClick={() => setPaymentMethod('online')}
-              >
-                <span className="material-icons-round text-2xl">qr_code_2</span>
-                <span className="text-xs font-black uppercase tracking-widest">Online</span>
-              </button>
+                  className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === 'online' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 bg-white text-slate-500'}`}
+                  type="button"
+                  onClick={() => setPaymentMethod('online')}
+                >
+                  <span className="material-icons-round text-2xl">qr_code_2</span>
+                  <span className="text-xs font-black uppercase tracking-widest">Online</span>
+                </button>
+              </div>
             </div>
-          </div>
+
+            {paymentMethod === 'online' && (
+              <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-icons-round text-primary text-lg">account_balance</span>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-primary">Deposit Requirement</h3>
+                </div>
+                <p className="text-[11px] text-slate-500">Buyers must pay a deposit when they win. Funds are held by GatherU until delivery is confirmed.</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-600">Deposit Percentage</span>
+                    <span className="text-sm font-black text-primary">{depositPercentage}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={5}
+                    max={50}
+                    step={5}
+                    value={depositPercentage}
+                    onChange={(e) => setDepositPercentage(parseInt(e.target.value))}
+                    className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                    <span>5%</span>
+                    <span>25%</span>
+                    <span>50%</span>
+                  </div>
+                </div>
+                {(startingBid || buyNowPrice) && (
+                  <div className="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between">
+                    <span className="text-xs text-slate-500">Estimated deposit</span>
+                    <span className="text-sm font-bold text-secondary">
+                      ${((parseFloat(startingBid || buyNowPrice || '0') * depositPercentage) / 100).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           <div className="bg-slate-50 p-4 rounded-xl flex items-center justify-between border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
