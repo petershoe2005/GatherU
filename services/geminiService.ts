@@ -3,11 +3,11 @@ import { GoogleGenAI } from "@google/genai";
 
 let ai: GoogleGenAI | null = null;
 
-const getAI = () => {
-  if (!ai && process.env.API_KEY) {
-    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  }
-  return new GoogleGenAI({ apiKey: process.env.API_KEY || "AIzaSyDiYKf-wOQL1KV9I8uOhW43XQqHb8thKjs" });
+const getAI = (): GoogleGenAI | null => {
+  const key = process.env.API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
+  if (!key) return null;
+  if (!ai) ai = new GoogleGenAI({ apiKey: key });
+  return ai;
 };
 
 export const getSmartDescription = async (itemTitle: string) => {
