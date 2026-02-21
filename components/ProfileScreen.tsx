@@ -68,20 +68,18 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onNavigate }) => {
              )}
            </div>
 
-           <div className="flex items-center gap-2 flex-wrap justify-center">
-             <h1 className="text-xl font-black text-white leading-tight">{profile?.name || 'User'}</h1>
-             {profile?.is_verified && (
-               <span className="inline-flex items-center gap-1 bg-primary/20 border border-primary/30 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">
-                 <span className="material-icons text-[11px]">verified</span>
-                 Verified
-               </span>
-             )}
-           </div>
-           <p className="text-slate-400 text-xs mt-0.5">@{profile?.username || 'guest'}</p>
-           <div className="flex items-center gap-1 mt-1.5">
-             <span className="material-icons-round text-primary text-[13px]">school</span>
-             <p className="text-[11px] text-slate-300 font-medium">{profile?.institution || 'University'}</p>
-           </div>
+            <h1 className="text-xl font-black text-white leading-tight">{profile?.name || 'User'}</h1>
+            <p className="text-slate-400 text-xs mt-0.5">@{profile?.username || 'guest'}</p>
+            <div className="flex items-center gap-1 mt-1.5">
+              <span className="material-icons-round text-primary text-[13px]">school</span>
+              <p className="text-[11px] text-slate-300 font-medium">{profile?.institution || 'University'}</p>
+            </div>
+            {profile?.is_verified && (
+              <div className="mt-2.5 inline-flex items-center gap-1.5 bg-primary/15 border border-primary/30 text-primary text-[11px] font-bold px-3 py-1 rounded-full">
+                <span className="material-icons text-[13px]">verified</span>
+                Verified Student
+              </div>
+            )}
          </div>
       </div>
 
