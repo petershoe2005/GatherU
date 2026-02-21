@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { getSmartDescription } from '../services/geminiService';
 import { Item } from '../types';
 import { useAuth } from '../contexts/useAuth';
 import { createItem } from '../services/itemsService';
@@ -22,10 +21,9 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('cash');
   const [listingType, setListingType] = useState<'auction' | 'fixed' | 'both'>('auction');
   const [bidIncrement, setBidIncrement] = useState('1');
-  const [isLoadingAi, setIsLoadingAi] = useState(false);
-    const [isPublishing, setIsPublishing] = useState(false);
-    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-    const [depositPercentage, setDepositPercentage] = useState(10);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [depositPercentage, setDepositPercentage] = useState(10);
   const [showNearby, setShowNearby] = useState(false);
 
   // Housing specific state
@@ -36,14 +34,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
   const [isFurnished, setIsFurnished] = useState(false);
   const [utilitiesIncluded, setUtilitiesIncluded] = useState(false);
   const [sqft, setSqft] = useState('');
-
-  const handleAiDescription = async () => {
-    if (!title) return;
-    setIsLoadingAi(true);
-    const text = await getSmartDescription(title);
-    if (text) setDescription(text);
-    setIsLoadingAi(false);
-  };
 
   const handlePublish = async () => {
     if (!title || !user) return;
@@ -135,7 +125,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
 
         <section className="px-4 py-2 space-y-4">
           <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Item Title <span className="text-red-500">*</span></label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Item Title <span className="text-red-500">*</span></label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -146,7 +136,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             />
           </div>
           <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Category <span className="text-red-500">*</span></label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Category <span className="text-red-500">*</span></label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -221,14 +211,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
           <div>
             <div className="flex justify-between items-center mb-1.5">
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest ml-1">Description</label>
-              <button
-                type="button"
-                onClick={handleAiDescription}
-                disabled={!title || isLoadingAi}
-                className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-bold hover:bg-primary/20 disabled:opacity-50"
-              >
-                {isLoadingAi ? 'AI Thinking...' : '✨ Smart AI Desc'}
-              </button>
             </div>
             <textarea
               value={description}
@@ -279,7 +261,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
               <div className={`grid ${listingType === 'both' ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-4'}`}>
                 {(listingType === 'auction' || listingType === 'both') && (
                   <div>
-                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Starting Bid <span className="text-red-500">*</span></label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Starting Bid <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                       <input
@@ -294,9 +276,9 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 )}
                 {(listingType === 'fixed' || listingType === 'both') && (
                   <div>
-                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
-                        {listingType === 'both' ? 'Buy Now Price' : 'Price'} <span className="text-red-500">*</span>
-                      </label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                      {listingType === 'both' ? 'Buy Now Price' : 'Price'} <span className="text-red-500">*</span>
+                    </label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                       <input
@@ -356,7 +338,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             </div>
             <div className="flex gap-3">
               <div className="flex-1">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Rent Amount <span className="text-red-500">*</span></label>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Rent Amount <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                   <input
@@ -397,83 +379,83 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 <span className="text-xs font-black uppercase tracking-widest">Cash</span>
               </button>
               <button
-                  className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === 'online' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 bg-white text-slate-500'}`}
-                  type="button"
-                  onClick={() => setPaymentMethod('online')}
-                >
-                  <span className="material-icons-round text-2xl">qr_code_2</span>
-                  <span className="text-xs font-black uppercase tracking-widest">Online</span>
-                </button>
-              </div>
+                className={`flex-1 py-4 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === 'online' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 bg-white text-slate-500'}`}
+                type="button"
+                onClick={() => setPaymentMethod('online')}
+              >
+                <span className="material-icons-round text-2xl">qr_code_2</span>
+                <span className="text-xs font-black uppercase tracking-widest">Online</span>
+              </button>
             </div>
+          </div>
 
-            {paymentMethod === 'online' && (
-              <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="material-icons-round text-primary text-lg">account_balance</span>
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-primary">Deposit Requirement</h3>
-                </div>
-                <p className="text-[11px] text-slate-500">Buyers must pay a deposit when they win. Funds are held by GatherU until delivery is confirmed.</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-600">Deposit Percentage</span>
-                    <span className="text-sm font-black text-primary">{depositPercentage}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={5}
-                    max={50}
-                    step={5}
-                    value={depositPercentage}
-                    onChange={(e) => setDepositPercentage(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
-                  />
-                  <div className="flex justify-between text-[10px] text-slate-400 font-medium">
-                    <span>5%</span>
-                    <span>25%</span>
-                    <span>50%</span>
-                  </div>
-                </div>
-                {(startingBid || buyNowPrice) && (
-                  <div className="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between">
-                    <span className="text-xs text-slate-500">Estimated deposit</span>
-                    <span className="text-sm font-bold text-secondary">
-                      ${((parseFloat(startingBid || buyNowPrice || '0') * depositPercentage) / 100).toFixed(2)}
-                    </span>
-                  </div>
-                )}
+          {paymentMethod === 'online' && (
+            <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="material-icons-round text-primary text-lg">account_balance</span>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-primary">Deposit Requirement</h3>
               </div>
-            )}
+              <p className="text-[11px] text-slate-500">Buyers must pay a deposit when they win. Funds are held by GatherU until delivery is confirmed.</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-600">Deposit Percentage</span>
+                  <span className="text-sm font-black text-primary">{depositPercentage}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={5}
+                  max={50}
+                  step={5}
+                  value={depositPercentage}
+                  onChange={(e) => setDepositPercentage(parseInt(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                />
+                <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                  <span>5%</span>
+                  <span>25%</span>
+                  <span>50%</span>
+                </div>
+              </div>
+              {(startingBid || buyNowPrice) && (
+                <div className="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between">
+                  <span className="text-xs text-slate-500">Estimated deposit</span>
+                  <span className="text-sm font-bold text-secondary">
+                    ${((parseFloat(startingBid || buyNowPrice || '0') * depositPercentage) / 100).toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
           <div className="bg-slate-50 p-4 rounded-xl flex items-center justify-between border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                 <span className="material-icons-round text-lg">near_me</span>
               </div>
               <div>
-                  <h3 className="text-sm font-bold leading-tight">Location</h3>
-                  <p className="text-[11px] text-slate-500">
-                    {category === 'housing' ? 'Show detailed location' : 'Also show to nearby users'}
-                  </p>
-                </div>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={showNearby}
-                    onChange={e => setShowNearby(e.target.checked)}
-                  />
-                  <div className="w-11 h-6 bg-slate-300 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-                </label>
-            </div>
-            {category !== 'housing' && (
-              <div className="flex items-start gap-2 px-1 mt-2">
-                <span className="material-icons-round text-sm text-amber-500 mt-0.5">info</span>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Your listing is shown to students at your institution by default. Enable this to also reach nearby users outside your institution.
+                <h3 className="text-sm font-bold leading-tight">Location</h3>
+                <p className="text-[11px] text-slate-500">
+                  {category === 'housing' ? 'Show detailed location' : 'Also show to nearby users'}
                 </p>
               </div>
-            )}
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={showNearby}
+                onChange={e => setShowNearby(e.target.checked)}
+              />
+              <div className="w-11 h-6 bg-slate-300 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+            </label>
+          </div>
+          {category !== 'housing' && (
+            <div className="flex items-start gap-2 px-1 mt-2">
+              <span className="material-icons-round text-sm text-amber-500 mt-0.5">info</span>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Your listing is shown to students at your institution by default. Enable this to also reach nearby users outside your institution.
+              </p>
+            </div>
+          )}
         </section>
       </form>
 
