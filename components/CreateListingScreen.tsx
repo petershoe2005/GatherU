@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { getSmartDescription } from '../services/geminiService';
 import { Item } from '../types';
 import { useAuth } from '../contexts/useAuth';
 import { createItem } from '../services/itemsService';
@@ -22,7 +21,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('cash');
   const [listingType, setListingType] = useState<'auction' | 'fixed' | 'both'>('auction');
   const [bidIncrement, setBidIncrement] = useState('1');
-  const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
@@ -34,14 +32,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
   const [isFurnished, setIsFurnished] = useState(false);
   const [utilitiesIncluded, setUtilitiesIncluded] = useState(false);
   const [sqft, setSqft] = useState('');
-
-  const handleAiDescription = async () => {
-    if (!title) return;
-    setIsLoadingAi(true);
-    const text = await getSmartDescription(title);
-    if (text) setDescription(text);
-    setIsLoadingAi(false);
-  };
 
   const handlePublish = async () => {
     if (!title || !user) return;
@@ -100,11 +90,13 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       // Location unavailable — item will only show for same-school users
     }
 
-    const newItem = await createItem(itemData);
-    setIsPublishing(false);
-
-    if (newItem) {
-      onPublish(newItem);
+    try {
+      const newItem = await createItem(itemData);
+      if (newItem) onPublish(newItem);
+    } catch (err) {
+      console.error('Failed to publish listing:', err);
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -218,14 +210,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
           <div>
             <div className="flex justify-between items-center mb-1.5">
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest ml-1">Description</label>
-              <button
-                type="button"
-                onClick={handleAiDescription}
-                disabled={!title || isLoadingAi}
-                className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-bold hover:bg-primary/20 disabled:opacity-50"
-              >
-                {isLoadingAi ? 'AI Thinking...' : '✨ Smart AI Desc'}
-              </button>
             </div>
             <textarea
               value={description}
