@@ -11,7 +11,7 @@ interface DepositCheckoutScreenProps {
   onSuccess: () => void;
 }
 
-const PLATFORM_FEE_RATE = 0.02;
+const PLATFORM_FEE_RATE = 0.05;
 
 const DepositCheckoutForm: React.FC<DepositCheckoutScreenProps> = ({ item, onBack, onSuccess }) => {
   const stripe = useStripe();
@@ -154,7 +154,7 @@ const DepositCheckoutForm: React.FC<DepositCheckoutScreenProps> = ({ item, onBac
             <span className="text-primary font-bold">${depositAmount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-slate-300">Platform Fee (2%)</span>
+              <span className="text-slate-300">Platform Fee (5%)</span>
             <span className="text-white font-bold">${platformFee.toFixed(2)}</span>
           </div>
           <div className="border-t border-slate-600 pt-3 flex justify-between">
@@ -196,7 +196,7 @@ const DepositCheckoutForm: React.FC<DepositCheckoutScreenProps> = ({ item, onBac
           <span className="material-icons-round text-amber-500 mt-0.5 shrink-0">info</span>
           <div className="space-y-1">
             <p className="text-xs text-amber-400 font-bold">Deposit Terms</p>
-            <p className="text-[11px] text-slate-400">If you back out of this purchase, the deposit is forfeited to the seller. If the seller fails to deliver, you receive a full refund.</p>
+              <p className="text-[11px] text-slate-400">If you back out of this purchase, your deposit is forfeited and kept by GatherU. If the seller backs out or fails to deliver, you receive a full refund and the seller's account is flagged.</p>
           </div>
         </div>
 

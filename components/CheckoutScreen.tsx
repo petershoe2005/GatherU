@@ -11,7 +11,7 @@ interface CheckoutScreenProps {
   onSuccess: () => void;
 }
 
-const PLATFORM_FEE_RATE = 0.03;
+const PLATFORM_FEE_RATE = 0.05;
 
 const CheckoutForm: React.FC<CheckoutScreenProps> = ({ item, onBack, onSuccess }) => {
   const stripe = useStripe();
@@ -113,7 +113,7 @@ const CheckoutForm: React.FC<CheckoutScreenProps> = ({ item, onBack, onSuccess }
             <span className="text-white font-bold">${itemPrice.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-slate-300">Platform Fee (3%)</span>
+              <span className="text-slate-300">Platform Fee (5%)</span>
             <span className="text-white font-bold">${platformFee.toFixed(2)}</span>
           </div>
           <div className="border-t border-slate-600 pt-3 flex justify-between">

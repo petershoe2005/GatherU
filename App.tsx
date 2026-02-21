@@ -58,11 +58,12 @@ const AppContent: React.FC = () => {
           const { latitude, longitude } = position.coords;
           try {
             // Reverse geocode to get city name
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
-            if (!res.ok) throw new Error('Geocode failed');
-            const text = await res.text();
-            if (!text) throw new Error('Empty response');
-            const data = JSON.parse(text);
+              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+              if (!res.ok) throw new Error('Geocode failed');
+              const text = await res.text();
+              if (!text || !text.trim()) throw new Error('Empty response');
+              let data: any;
+              try { data = JSON.parse(text); } catch { throw new Error('Invalid JSON from geocoder'); }
             const cityName = data?.address?.city || data?.address?.town || data?.address?.village || 'Current Location';
 
             setUserLocation({
@@ -160,30 +161,28 @@ const AppContent: React.FC = () => {
       const isStudent = profile.is_verified && !!profile.institution;
 
       const filtered = allItems.filter(item => {
-        // Check if same school (for .edu students)
-        const sameSchool = isStudent && item.seller?.institution === profile.institution;
+          // Always show items that have no coordinates (uploaded without GPS)
+          if (item.latitude == null || item.longitude == null) return true;
 
-        // Check if within radius (only for items with coordinates)
-        let withinRadius = false;
-        if (item.latitude != null && item.longitude != null) {
+          // Check if same school (for .edu students)
+          const sameSchool = isStudent && item.seller?.institution === profile.institution;
+
+          // Check if within radius
           const dist = haversineDistance(
             userLocation.lat, userLocation.lng,
             item.latitude, item.longitude
           );
-          withinRadius = dist <= radius;
-        }
+          const withinRadius = dist <= radius;
 
-        if (isStudent) {
-          // Students see: same school items (regardless of coords) + nearby items that opted into show_nearby
-          return sameSchool || (withinRadius && item.show_nearby);
-        } else {
-          // Local members see: only nearby items that opted into show_nearby
-          return withinRadius && item.show_nearby;
-        }
-      });
+          if (isStudent) {
+            return sameSchool || (withinRadius && item.show_nearby);
+          } else {
+            return withinRadius && item.show_nearby;
+          }
+        });
 
-      // If filtering results in nothing (e.g. no items have coords yet), show all for now
-      setItems(filtered.length > 0 ? filtered : allItems);
+        // If filtering results in nothing, show all real items
+        setItems(filtered.length > 0 ? filtered : allItems);
     } else {
       setItems(allItems);
     }

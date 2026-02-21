@@ -1,7 +1,7 @@
 import { loadStripe } from '@stripe/stripe-js';
+import { supabase } from '../lib/supabase';
 
 const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-const secretKey = import.meta.env.VITE_STRIPE_SECRET_KEY;
 
 export const stripePromise = loadStripe(publishableKey);
 
@@ -9,36 +9,15 @@ export const createPaymentIntent = async (
   amountInCents: number,
   metadata?: Record<string, string>
 ): Promise<{ clientSecret: string; paymentIntentId: string }> => {
-  const body = new URLSearchParams();
-  body.append('amount', amountInCents.toString());
-  body.append('currency', 'usd');
-  body.append('automatic_payment_methods[enabled]', 'true');
-
-  if (metadata) {
-    Object.entries(metadata).forEach(([key, value]) => {
-      body.append(`metadata[${key}]`, value);
-    });
-  }
-
-  const response = await fetch('https://api.stripe.com/v1/payment_intents', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${secretKey}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: body.toString(),
+  const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+    body: { amountInCents, metadata },
   });
 
-  if (!response.ok) {
-    const text = await response.text();
-    let message = 'Failed to create payment intent';
-    try { message = JSON.parse(text).error?.message || message; } catch {}
-    throw new Error(message);
-  }
+  if (error) throw new Error(error.message || 'Failed to create payment intent');
+  if (data?.error) throw new Error(data.error);
 
-  const data = await response.json();
   return {
-    clientSecret: data.client_secret,
-    paymentIntentId: data.id,
+    clientSecret: data.clientSecret,
+    paymentIntentId: data.paymentIntentId,
   };
 };

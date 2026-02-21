@@ -32,15 +32,27 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
   };
 
   useEffect(() => {
+    let cancelled = false;
     const load = async () => {
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       loadDrafts();
-      const data = await fetchMyListings(user.id);
-      setItems(data);
-      setLoading(false);
+      try {
+        const data = await fetchMyListings(user.id);
+        if (!cancelled) {
+          setItems(data);
+        }
+      } catch (err) {
+        console.error('Error loading listings:', err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
     load();
-  }, [user]);
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const activeItems = items.filter(i => i.status === 'active' || i.status === 'winning' || i.status === 'outbid');
   const pendingItems = items.filter(i => i.status === 'ended');
@@ -137,7 +149,7 @@ const MyListingsScreen: React.FC<MyListingsScreenProps> = ({ onBack, onSelectIte
       <main className="px-4 mt-6">
         <div className="mb-4">
           <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">
-            {activeTab === 'Pending' ? 'Pending Delivery' : `${activeTab} Listings`} ({displayItems.length})
+              {activeTab === 'Pending' ? 'Pending Delivery' : `${activeTab} Listings`} ({activeTab === 'Drafts' ? drafts.length : displayItems.length})
           </h2>
         </div>
 

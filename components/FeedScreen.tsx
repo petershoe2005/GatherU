@@ -37,9 +37,10 @@ const SECTION_COLORS: Record<string, string> = {
 const ItemCard: React.FC<{
   item: Item;
   isFav: boolean;
+  isOwn: boolean;
   onSelect: () => void;
   onToggleFav: (e: React.MouseEvent) => void;
-}> = ({ item, isFav, onSelect, onToggleFav }) => (
+}> = ({ item, isFav, isOwn, onSelect, onToggleFav }) => (
   <div
     onClick={onSelect}
     className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer"
@@ -64,6 +65,12 @@ const ItemCard: React.FC<{
           <span className="bg-amber-500/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white flex items-center gap-1 shadow-sm">
             <span className="material-icons-round text-[10px]">rocket_launch</span>
             Boosted
+          </span>
+        )}
+        {isOwn && (
+          <span className="bg-primary/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white flex items-center gap-1 shadow-sm">
+            <span className="material-icons-round text-[10px]">storefront</span>
+            Your listing
           </span>
         )}
       </div>
@@ -290,14 +297,15 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredItems.map(item => (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    isFav={favorites.has(item.id)}
-                    onSelect={() => onSelectItem(item)}
-                    onToggleFav={e => handleToggleFavorite(e, item.id)}
-                  />
+              {filteredItems.map(item => (
+                    <ItemCard
+                      key={item.id}
+                      item={item}
+                      isFav={favorites.has(item.id)}
+                      isOwn={item.seller_id === user?.id}
+                      onSelect={() => onSelectItem(item)}
+                      onToggleFav={e => handleToggleFavorite(e, item.id)}
+                    />
                 ))}
               </div>
             )}
@@ -341,13 +349,14 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
                 {/* Section Items */}
                 <div className="space-y-4">
                   {displayItems.map(item => (
-                    <ItemCard
-                      key={`${section.id}-${item.id}`}
-                      item={item}
-                      isFav={favorites.has(item.id)}
-                      onSelect={() => onSelectItem(item)}
-                      onToggleFav={e => handleToggleFavorite(e, item.id)}
-                    />
+                      <ItemCard
+                        key={`${section.id}-${item.id}`}
+                        item={item}
+                        isFav={favorites.has(item.id)}
+                        isOwn={item.seller_id === user?.id}
+                        onSelect={() => onSelectItem(item)}
+                        onToggleFav={e => handleToggleFavorite(e, item.id)}
+                      />
                   ))}
                 </div>
 

@@ -239,7 +239,7 @@ export function dbItemToItem(row: any, sellerProfile?: Profile): Item {
     images: row.images?.length ? row.images : ['https://picsum.photos/seed/' + row.id + '/400/300'],
     seller,
     isVerifiedSeller: seller.isVerified,
-    status: row.status === 'active' ? undefined : row.status,
+    status: row.status,
     viewCount: row.view_count || 0,
     activeBidders: row.active_bidders || 0,
     payment_method: row.payment_method,
