@@ -26,6 +26,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
     const [isPublishing, setIsPublishing] = useState(false);
     const [uploadedImages, setUploadedImages] = useState<string[]>([]);
     const [depositPercentage, setDepositPercentage] = useState(10);
+  const [showNearby, setShowNearby] = useState(false);
 
   // Housing specific state
   const [housingType, setHousingType] = useState<'apartment' | 'room' | 'sublet' | 'house'>('sublet');
@@ -71,7 +72,8 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
         images: uploadedImages.length > 0 ? uploadedImages : ['https://picsum.photos/seed/' + title.replace(/\s/g, '-') + '/400/300'],
         payment_method: paymentMethod,
         listing_type: category === 'housing' ? 'fixed' : listingType,
-        deposit_percentage: paymentMethod === 'online' ? depositPercentage : 10,
+          deposit_percentage: paymentMethod === 'online' ? depositPercentage : 10,
+          show_nearby: showNearby,
       };
 
     if (category === 'housing') {
@@ -449,17 +451,30 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                 <span className="material-icons-round text-lg">near_me</span>
               </div>
               <div>
-                <h3 className="text-sm font-bold leading-tight">Location</h3>
-                <p className="text-[11px] text-slate-500">
-                  {category === 'housing' ? 'Show detailed location' : 'Only show to nearby students'}
+                  <h3 className="text-sm font-bold leading-tight">Location</h3>
+                  <p className="text-[11px] text-slate-500">
+                    {category === 'housing' ? 'Show detailed location' : 'Also show to nearby users'}
+                  </p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={showNearby}
+                    onChange={e => setShowNearby(e.target.checked)}
+                  />
+                  <div className="w-11 h-6 bg-slate-300 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                </label>
+            </div>
+            {category !== 'housing' && (
+              <div className="flex items-start gap-2 px-1 mt-2">
+                <span className="material-icons-round text-sm text-amber-500 mt-0.5">info</span>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Your listing is shown to students at your institution by default. Enable this to also reach nearby users outside your institution.
                 </p>
               </div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input checked className="sr-only peer" type="checkbox" readOnly />
-              <div className="w-11 h-6 bg-slate-300 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-            </label>
-          </div>
+            )}
         </section>
       </form>
 

@@ -30,8 +30,10 @@ export const createPaymentIntent = async (
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || 'Failed to create payment intent');
+    const text = await response.text();
+    let message = 'Failed to create payment intent';
+    try { message = JSON.parse(text).error?.message || message; } catch {}
+    throw new Error(message);
   }
 
   const data = await response.json();
