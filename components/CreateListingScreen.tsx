@@ -63,6 +63,7 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       payment_method: paymentMethod,
       listing_type: category === "housing" ? "fixed" : listingType,
       deposit_percentage: paymentMethod === "online" ? depositPercentage : 10,
+      show_nearby: showNearby,
     };
 
     if (category === 'housing') {
