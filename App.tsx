@@ -41,8 +41,8 @@ const AppContent: React.FC = () => {
   const [userLocation, setUserLocation] = useState<AppLocation>({ name: 'Detecting...', lat: 37.4419, lng: -122.1430 });
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [checkoutItem, setCheckoutItem] = useState<Item | null>(null);
-    const [depositItem, setDepositItem] = useState<Item | null>(null);
-    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [depositItem, setDepositItem] = useState<Item | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Request location on mount
   useEffect(() => {
@@ -173,11 +173,11 @@ const AppContent: React.FC = () => {
         }
 
         if (isStudent) {
-          // Students see: same school items (regardless of coords) + nearby items within radius
-          return sameSchool || withinRadius;
+          // Students see: same school items (regardless of coords) + nearby items that opted into show_nearby
+          return sameSchool || (withinRadius && item.show_nearby);
         } else {
-          // Local members see: only items within radius (must have coords)
-          return withinRadius;
+          // Local members see: only nearby items that opted into show_nearby
+          return withinRadius && item.show_nearby;
         }
       });
 
@@ -318,17 +318,17 @@ const AppContent: React.FC = () => {
         );
       case AppScreen.DETAILS:
         return selectedItem ? (
-            <DetailsScreen
-              item={selectedItem}
-              onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
-              onConfirmDelivery={() => navigate(AppScreen.DELIVERY, selectedItem)}
-              onViewLive={() => navigate(AppScreen.LIVE_STATUS, selectedItem)}
-              onEndBidding={() => handleEndBidding(selectedItem.id)}
-              onBuyNow={() => { setCheckoutItem(selectedItem); setCurrentScreen(AppScreen.CHECKOUT); pushRoute(AppScreen.CHECKOUT); }}
-              onMessageSeller={handleMessageSeller}
-              onViewSellerProfile={() => { setSelectedUserId(selectedItem.seller_id); setCurrentScreen(AppScreen.USER_PROFILE); pushRoute(AppScreen.USER_PROFILE); }}
-              onPayDeposit={() => { setDepositItem(selectedItem); setCurrentScreen(AppScreen.DEPOSIT_CHECKOUT); pushRoute(AppScreen.DEPOSIT_CHECKOUT); }}
-            />
+          <DetailsScreen
+            item={selectedItem}
+            onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
+            onConfirmDelivery={() => navigate(AppScreen.DELIVERY, selectedItem)}
+            onViewLive={() => navigate(AppScreen.LIVE_STATUS, selectedItem)}
+            onEndBidding={() => handleEndBidding(selectedItem.id)}
+            onBuyNow={() => { setCheckoutItem(selectedItem); setCurrentScreen(AppScreen.CHECKOUT); pushRoute(AppScreen.CHECKOUT); }}
+            onMessageSeller={handleMessageSeller}
+            onViewSellerProfile={() => { setSelectedUserId(selectedItem.seller_id); setCurrentScreen(AppScreen.USER_PROFILE); pushRoute(AppScreen.USER_PROFILE); }}
+            onPayDeposit={() => { setDepositItem(selectedItem); setCurrentScreen(AppScreen.DEPOSIT_CHECKOUT); pushRoute(AppScreen.DEPOSIT_CHECKOUT); }}
+          />
         ) : null;
       case AppScreen.CREATE:
         return <CreateListingScreen onBack={() => { setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }} onPublish={handlePublishListing} />;
@@ -377,21 +377,21 @@ const AppContent: React.FC = () => {
       case AppScreen.CHAT_DETAIL:
         return <ChatDetailScreen conversationId={selectedConversationId} onBack={() => { setCurrentScreen(AppScreen.MESSAGES); pushRoute(AppScreen.MESSAGES); }} />;
       case AppScreen.CHECKOUT:
-          return checkoutItem ? (
-            <CheckoutScreen
-              item={checkoutItem}
-              onBack={() => { setCurrentScreen(AppScreen.DETAILS); pushRoute(AppScreen.DETAILS, { id: checkoutItem.id }); }}
-              onSuccess={() => { setCheckoutItem(null); setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
-            />
-          ) : null;
-        case AppScreen.DEPOSIT_CHECKOUT:
-          return depositItem ? (
-            <DepositCheckoutScreen
-              item={depositItem}
-              onBack={() => { setCurrentScreen(AppScreen.DETAILS); if (depositItem) pushRoute(AppScreen.DETAILS, { id: depositItem.id }); }}
-              onSuccess={() => { setDepositItem(null); setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
-            />
-          ) : null;
+        return checkoutItem ? (
+          <CheckoutScreen
+            item={checkoutItem}
+            onBack={() => { setCurrentScreen(AppScreen.DETAILS); pushRoute(AppScreen.DETAILS, { id: checkoutItem.id }); }}
+            onSuccess={() => { setCheckoutItem(null); setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
+          />
+        ) : null;
+      case AppScreen.DEPOSIT_CHECKOUT:
+        return depositItem ? (
+          <DepositCheckoutScreen
+            item={depositItem}
+            onBack={() => { setCurrentScreen(AppScreen.DETAILS); if (depositItem) pushRoute(AppScreen.DETAILS, { id: depositItem.id }); }}
+            onSuccess={() => { setDepositItem(null); setCurrentScreen(AppScreen.FEED); pushRoute(AppScreen.FEED); }}
+          />
+        ) : null;
       case AppScreen.USER_PROFILE:
         return selectedUserId ? (
           <UserProfileScreen

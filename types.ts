@@ -78,6 +78,7 @@ export interface Item {
   created_at?: string;
   listing_type?: 'auction' | 'fixed' | 'both';
   buyNowPrice?: number;
+  show_nearby?: boolean;
   // Housing fields
   housing_type?: 'apartment' | 'room' | 'sublet' | 'house';
   lease_start?: string;
@@ -87,12 +88,12 @@ export interface Item {
   utilities_included?: boolean;
   sqft?: number;
   bid_increment?: number;
-    latitude?: number | null;
-    longitude?: number | null;
-    deposit_percentage?: number;
-    is_boosted?: boolean;
-    boost_expires_at?: string | null;
-  }
+  latitude?: number | null;
+  longitude?: number | null;
+  deposit_percentage?: number;
+  is_boosted?: boolean;
+  boost_expires_at?: string | null;
+}
 
 export interface Category {
   id: string;
@@ -168,15 +169,15 @@ export function profileToUser(profile: Profile): User {
 }
 
 export interface AppNotification {
-    id: string;
-    user_id: string;
-    type: 'bid' | 'outbid' | 'message' | 'sold' | 'order' | 'system' | 'review';
-    title: string;
-    body: string;
-    read: boolean;
-    data?: Record<string, any>;
-    created_at: string;
-  }
+  id: string;
+  user_id: string;
+  type: 'bid' | 'outbid' | 'message' | 'sold' | 'order' | 'system' | 'review';
+  title: string;
+  body: string;
+  read: boolean;
+  data?: Record<string, any>;
+  created_at: string;
+}
 
 export interface EscrowTransaction {
   id: string;
@@ -230,12 +231,12 @@ export function dbItemToItem(row: any, sellerProfile?: Profile): Item {
     is_furnished: row.is_furnished,
     utilities_included: row.utilities_included,
     sqft: row.sqft,
-      latitude: row.latitude ? Number(row.latitude) : null,
-      longitude: row.longitude ? Number(row.longitude) : null,
-      deposit_percentage: row.deposit_percentage || 10,
-      is_boosted: row.is_boosted || false,
-      boost_expires_at: row.boost_expires_at || null,
-    };
+    latitude: row.latitude ? Number(row.latitude) : null,
+    longitude: row.longitude ? Number(row.longitude) : null,
+    deposit_percentage: row.deposit_percentage || 10,
+    is_boosted: row.is_boosted || false,
+    boost_expires_at: row.boost_expires_at || null,
+  };
 }
 
 export interface AppLocation {
