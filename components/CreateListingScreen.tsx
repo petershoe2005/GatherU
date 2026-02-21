@@ -100,7 +100,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       console.log("Location fetch skipped or timed out");
     }
 
-<<<<<<< HEAD
     try {
       const newItem = await createItem(itemData);
       if (newItem) {
@@ -112,17 +111,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
       setIsPublishing(false);
     }
   };
-=======
-      try {
-        const newItem = await createItem(itemData);
-        if (newItem) onPublish(newItem);
-      } catch (err) {
-        console.error('Failed to publish listing:', err);
-      } finally {
-        setIsPublishing(false);
-      }
-    };
->>>>>>> 5f635060c0dfe5d1d5cef7fb8cc6fd98cc990750
 
   const isValid = title && (
     (category === 'housing' && buyNowPrice && leaseStart && leaseEnd) ||
@@ -460,7 +448,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
                   {category === 'housing' ? 'Show detailed location' : 'Also show to nearby users'}
                 </p>
               </div>
-<<<<<<< HEAD
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -481,10 +468,6 @@ const CreateListingScreen: React.FC<CreateListingScreenProps> = ({ onBack, onPub
             </div>
           )}
         </section>
-=======
-            )}
-          </section>
->>>>>>> 5f635060c0dfe5d1d5cef7fb8cc6fd98cc990750
       </form>
 
       <footer className="p-4 bg-white border-t border-slate-200">
