@@ -25,7 +25,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ images, onImagesChange, m
         // Compress + upload each file in parallel
         const results = await Promise.all(
             files.map(async (f) => {
-                const compressed = await compressImage(f, 1200, 0.85);
+                const compressed = await compressImage(f, 600, 0.70);
                 const url = await uploadImage(compressed, 'listings');
                 completed++;
                 setProgress({ done: completed, total: files.length });
