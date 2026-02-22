@@ -28,7 +28,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
   const [currentBid, setCurrentBid] = useState(item.currentBid);
   const [isBidding, setIsBidding] = useState(false);
   const [showBidSuccess, setShowBidSuccess] = useState(false);
-  const [bidAmount, setBidAmount] = useState(item.currentBid + 5);
+  const [bidAmount, setBidAmount] = useState<string>(String(item.currentBid + 5));
   const [selectedImage, setSelectedImage] = useState(0);
   const [recentBids, setRecentBids] = useState<Bid[]>([]);
   const [activeBidders, setActiveBidders] = useState(item.activeBidders);
@@ -123,7 +123,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
     const channel = subscribeToBids(item.id, (payload: any) => {
       const newBid = payload.new as Bid;
       setCurrentBid(newBid.amount);
-      setBidAmount(newBid.amount + 5);
+        setBidAmount(String(newBid.amount + 5));
       setRecentBids(prev => [newBid, ...prev].slice(0, 5));
       setActiveBidders(prev => prev + 1);
     });
@@ -134,14 +134,14 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
   }, [item.id]);
 
   const handlePlaceBid = async () => {
-    if (isBidding || isEnded || !user || bidAmount <= currentBid) return;
+    if (isBidding || isEnded || !user || parseFloat(bidAmount) <= currentBid) return;
     setIsBidding(true);
 
-    const bid = await placeBid(item.id, user.id, bidAmount);
+    const bid = await placeBid(item.id, user.id, parseFloat(bidAmount));
 
     if (bid) {
       setCurrentBid(bid.amount);
-      setBidAmount(bid.amount + 5);
+        setBidAmount(String(bid.amount + 5));
       setShowBidSuccess(true);
       setTimeout(() => setShowBidSuccess(false), 3000);
       // Bids are a strong interest signal — score +3
@@ -165,7 +165,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
             </div>
             <div>
               <p className="font-bold text-white text-sm">Bid Placed Successfully!</p>
-              <p className="text-[11px] text-slate-400">Your bid of ${bidAmount > currentBid + 5 ? (currentBid).toFixed(2) : currentBid.toFixed(2)} is now the highest.</p>
+              <p className="text-[11px] text-slate-400">Your bid of ${parseFloat(bidAmount) > currentBid + 5 ? (currentBid).toFixed(2) : currentBid.toFixed(2)} is now the highest.</p>
             </div>
           </div>
         </div>
@@ -480,7 +480,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
                   <input
                     type="number"
                     value={bidAmount}
-                    onChange={(e) => setBidAmount(parseFloat(e.target.value) || 0)}
+                      onChange={(e) => setBidAmount(e.target.value)}
                     min={currentBid + 1}
                     className="w-full pl-7 pr-3 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary text-slate-900"
                   />
@@ -488,7 +488,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ item, onBack, onConfirmDe
               </div>
               <button
                 onClick={handlePlaceBid}
-                disabled={isBidding || bidAmount <= currentBid}
+                  disabled={isBidding || parseFloat(bidAmount) <= currentBid || !bidAmount}
                 className="flex-1 bg-primary hover:bg-primary/90 text-slate-900 font-black py-4 rounded-xl shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 mt-5"
               >
                 {isBidding ? (
