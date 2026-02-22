@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
         type: 'express',
         email: user.email,
         metadata: { supabase_user_id: user.id },
-        capabilities: { transfers: { requested: true } },
+        capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
       });
       accountId = account.id;
       await supabase.from('profiles').update({ stripe_account_id: accountId }).eq('id', user.id);
