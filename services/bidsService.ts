@@ -45,7 +45,7 @@ export const fetchBidsForItem = async (itemId: string): Promise<Bid[]> => {
 export const fetchUserBids = async (userId: string): Promise<any[]> => {
     const { data, error } = await supabase
         .from('bids')
-        .select('*, items(*, profiles(*))')
+        .select('*, items(*, profiles(*), orders(seller_confirmed, buyer_confirmed, status))')
         .eq('bidder_id', userId)
         .order('created_at', { ascending: false });
 

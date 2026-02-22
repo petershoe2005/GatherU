@@ -7,10 +7,14 @@ export const fetchItems = async (filters?: {
     search?: string;
     sortBy?: 'newest' | 'price-asc' | 'price-desc';
 }): Promise<Item[]> => {
+    // Hide items whose auction ended more than 12 hours ago
+    const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+
     let query = supabase
         .from('items')
         .select('*, profiles(*)')
-        .neq('status', 'ended');
+        .neq('status', 'ended')
+        .or(`ends_at.is.null,ends_at.gte.${twelveHoursAgo}`);
 
     if (filters?.category && filters.category !== 'all') {
         query = query.eq('category', filters.category);
@@ -20,11 +24,16 @@ export const fetchItems = async (filters?: {
         query = query.ilike('title', `%${filters.search}%`);
     }
 
+    // Always prioritize active (not-yet-ended) auctions first
+    query = query.order('status', { ascending: true }); // 'active' sorts before 'sold'/'ended'
+
     if (filters?.sortBy === 'price-asc') {
         query = query.order('current_bid', { ascending: true });
     } else if (filters?.sortBy === 'price-desc') {
         query = query.order('current_bid', { ascending: false });
     } else {
+        // Default: active auctions by soonest ending first, then newest
+        query = query.order('ends_at', { ascending: true, nullsFirst: false });
         query = query.order('created_at', { ascending: false });
     }
 

@@ -32,8 +32,23 @@ const BidsScreen: React.FC<BidsScreenProps> = ({ items, onNavigate }) => {
     setLoading(false);
   };
 
-  const activeBids = userBids.filter((b: any) => b.items?.status === 'active');
-  const pastBids = userBids.filter((b: any) => b.items?.status !== 'active');
+  const activeBids = userBids.filter((b: any) => {
+    const item = b.items;
+    if (!item) return false;
+    // Get the order for this item (if any)
+    const order = Array.isArray(item.orders) ? item.orders[0] : null;
+    // Active = no order yet, or order exists but both sides haven't confirmed delivery
+    if (!order) return true;
+    const bothConfirmed = order.buyer_confirmed && order.seller_confirmed;
+    return !bothConfirmed;
+  });
+  const pastBids = userBids.filter((b: any) => {
+    const item = b.items;
+    if (!item) return false;
+    // Past = order exists AND both buyer and seller confirmed delivery
+    const order = Array.isArray(item.orders) ? item.orders[0] : null;
+    return order?.buyer_confirmed && order?.seller_confirmed;
+  });
   const displayBids = activeTab === 'Active' ? activeBids : pastBids;
 
   return (
